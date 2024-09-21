@@ -20,6 +20,13 @@ class ActivityCubit extends Cubit<ActivityState> {
   bool repeated = true;
   int fieldNumber = 1;
 
+  Future<void> addActivity({
+    required String name,
+
+})async{
+
+}
+
 
 
 

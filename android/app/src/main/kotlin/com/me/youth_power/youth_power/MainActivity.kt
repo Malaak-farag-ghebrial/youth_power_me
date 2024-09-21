@@ -1,4 +1,4 @@
-package com.me.youth_power.youth_power
+package com.me.youth_power
 
 import io.flutter.embedding.android.FlutterActivity
 

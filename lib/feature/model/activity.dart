@@ -1,6 +1,7 @@
 
 
 import 'package:equatable/equatable.dart';
+import 'servant.dart';
 import 'times.dart';
 
 import '../../core/constants/api_keyword.dart';
@@ -9,7 +10,7 @@ import 'attendance.dart';
 class ActivityModel extends Equatable {
   final String id;
   final String name;
-  final String? servant;
+  final List<String> servant;
   final int points;
   final List<Times> times;
   final bool available;
@@ -19,7 +20,7 @@ class ActivityModel extends Equatable {
    const ActivityModel({
     required this.id,
     required this.name,
-     this.servant,
+     this.servant = const[],
      this.points = 0,
     required this.times,
      this.available = true,
@@ -64,6 +65,7 @@ class ActivityModel extends Equatable {
     data[ApiKey.id] = id;
     data[ApiKey.name] = name;
     data[ApiKey.points] = points;
+    data[ApiKey.servant] = servant.map((e)=> e);
     data[ApiKey.times] = times
         .map((e) => Times(
                 time: e.time,

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite/sqflite.dart';
@@ -9,6 +8,7 @@ import '../../view/activity/screens/activity_screen.dart';
 import '../../view/setting/screens/setting_screen.dart';
 import '../../view/student/screens/student_screen.dart';
 import '../../view/week/screens/main_screen.dart';
+
 part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
@@ -16,34 +16,32 @@ class HomeCubit extends Cubit<HomeState> {
 
   static HomeCubit get(context) => BlocProvider.of(context);
 
-
   List<Widget> screens = [
     const MainScreen(),
     StudentScreen(),
-     ActivityScreen(),
-     SettingScreen(),
+    ActivityScreen(),
+    SettingScreen(),
   ];
   int currentIndex = 0;
 
-  void createDatabase() async{
-    await openDatabase(
-      ApiKey.databasePath,version: 1,
+  void createDatabase() async {
+    await openDatabase(ApiKey.databasePath, version: 1,
         onCreate: (Database data, int version) async {
-        emit(CreateDatabaseLoading());
-        Batch batch = data.batch();
-        batch.execute('''
+      emit(CreateDatabaseLoading());
+      Batch batch = data.batch();
+      batch.execute('''
         CREATE TABLE ${ApiKey.activityTable}
         (
         ${ApiKey.id} INTEGER PRIMARY KEY,
         ${ApiKey.name} TEXT,
-        ${ApiKey.servant} TEXT,
+        ${ApiKey.servant} ARRAY,
         ${ApiKey.points} INTEGER,
         ${ApiKey.times} ARRAY,
         ${ApiKey.available} INTEGER,
         ${ApiKey.repeated} INTEGER,
         ${ApiKey.attendance} ARRAY)
         ''');
-        batch.execute('''
+      batch.execute('''
         CREATE TABLE ${ApiKey.studentTable} 
         (
         ${ApiKey.id} INTEGER PRIMARY KEY,
@@ -54,7 +52,7 @@ class HomeCubit extends Cubit<HomeState> {
         ${ApiKey.attendance} ARRAY,
         ${ApiKey.activity} ARRAY)
         ''');
-        batch.execute('''
+      batch.execute('''
         CREATE TABLE ${ApiKey.weekTable} 
         (
         ${ApiKey.id} INTEGER PRIMARY KEY,
@@ -63,15 +61,16 @@ class HomeCubit extends Cubit<HomeState> {
         ${ApiKey.activity} ARRAY,
         ${ApiKey.attendance} ARRAY)
         ''');
-        batch.execute('''
+      batch.execute('''
         CREATE TABLE ${ApiKey.timeTable}
+        (
         ${ApiKey.id} INTEGER PRIMARY KEY,
         ${ApiKey.times} TEXT,
         ${ApiKey.lastTimeAttend} TEXT,
         ${ApiKey.day} TEXT,
         ${ApiKey.date} TEXT)
         ''');
-        batch.execute('''
+      batch.execute('''
         CREATE TABLE ${ApiKey.pointTable}
         (
         ${ApiKey.id} INTEGER PRIMARY KEY,
@@ -79,8 +78,8 @@ class HomeCubit extends Cubit<HomeState> {
         ${ApiKey.week} ARRAY,
         ${ApiKey.value} INTEGER)
         ''');
-        batch.execute('''
-        CREATE TABLE ${ApiKey.attendance} 
+      batch.execute('''
+        CREATE TABLE ${ApiKey.attendanceTable} 
         (
         ${ApiKey.id} INTEGER PRIMARY KEY,
         ${ApiKey.studentId} INTEGER,
@@ -88,25 +87,29 @@ class HomeCubit extends Cubit<HomeState> {
         ${ApiKey.date} TEXT,
         ${ApiKey.attendTime} TEXT)
         ''');
-        await batch.commit().then((value){
-          GlobalFunction.print('database created');
-          emit(CreateDatabaseSuccess());
-        }).catchError((error){
-          GlobalFunction.errorPrint(error, 'create database error');
-          emit(CreateDatabaseFailed());
-        });
-        }
-
-    );
+      batch.execute('''
+      CREATE TABLE ${ApiKey.servantTable}
+      (
+      ${ApiKey.id} INTEGER PRIMARY KEY,
+      ${ApiKey.code} TEXT,
+      ${ApiKey.phone} TEXT,
+      ${ApiKey.name} TEXT,
+      ${ApiKey.attendance} ARRAY,
+      ${ApiKey.activity} ARRAY,
+      )
+      ''');
+      await batch.commit().then((value) {
+        GlobalFunction.print('database created');
+        emit(CreateDatabaseSuccess());
+      }).catchError((error) {
+        GlobalFunction.errorPrint(error, 'create database error');
+        emit(CreateDatabaseFailed());
+      });
+    });
   }
 
-
-
-  void btmNavBar(int index){
+  void btmNavBar(int index) {
     currentIndex = index;
     emit(BtmNavBar());
   }
-
-
-
 }

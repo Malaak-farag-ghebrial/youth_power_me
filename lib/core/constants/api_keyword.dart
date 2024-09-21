@@ -20,6 +20,7 @@ class ApiKey {
   static const String activityIds = 'activity_ids';
   static const String attendance = 'attendance';
   static const String attendanceTable = 'attendance_table';
+  static const String servantTable = 'servant_table';
   static const String available = 'available';
   static const String repeated = 'repeated';
   static const String firstRowIndex = 'first_row_index';
