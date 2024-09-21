@@ -1,0 +1,7 @@
+
+class QrCode {
+
+  void qrCodeGenerator(){
+
+  }
+}

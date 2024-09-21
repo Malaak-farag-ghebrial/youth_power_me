@@ -1,0 +1,106 @@
+{
+  "project_info": {
+    "project_number": "1079034001065",
+    "firebase_url": "https://eymp-90579-default-rtdb.firebaseio.com",
+    "project_id": "eymp-90579",
+    "storage_bucket": "eymp-90579.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079034001065:android:68a971292975853fdd5bb8",
+        "android_client_info": {
+          "package_name": "com.example.egtma3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1079034001065-dcifis7682m8j0kdeg70sfv7g8e1mmg0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.egtma3",
+            "certificate_hash": "2eed656b704c0e58747ce013b1f27902fd84c283"
+          }
+        },
+        {
+          "client_id": "1079034001065-d9lantmee84fgenn78r0loikiolb41nh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTRQRp0Bo3E_NsU1kAiWNamDP4XyR8GhY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1079034001065-d9lantmee84fgenn78r0loikiolb41nh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079034001065:android:c99cf54026d576fedd5bb8",
+        "android_client_info": {
+          "package_name": "com.example.youth_power"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1079034001065-d9lantmee84fgenn78r0loikiolb41nh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTRQRp0Bo3E_NsU1kAiWNamDP4XyR8GhY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1079034001065-d9lantmee84fgenn78r0loikiolb41nh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079034001065:android:bc8cb00366489e85dd5bb8",
+        "android_client_info": {
+          "package_name": "com.me.youth_power"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1079034001065-d9lantmee84fgenn78r0loikiolb41nh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTRQRp0Bo3E_NsU1kAiWNamDP4XyR8GhY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1079034001065-d9lantmee84fgenn78r0loikiolb41nh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
