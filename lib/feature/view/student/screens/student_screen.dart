@@ -8,6 +8,7 @@ import '../../../../core/constants/app_strings.dart';
 import '../../../controller/student_cubit/student_cubit.dart';
 import '../widgets/add_student_dialog.dart';
 import '../widgets/student_card.dart';
+import 'student_detail.dart';
 
 class StudentScreen extends StatelessWidget {
    StudentScreen({super.key});
@@ -45,7 +46,7 @@ final searchController = TextEditingController();
               MyInputField(
                 controller: searchController,
                 onChanged: (value){
-                 // StudentCubit.get(context).searchStudent(searchWord: value);
+                  StudentCubit.get(context).searchStudent(searchWord: value);
                 },
                 hintText: AppString.search,
               ),
@@ -55,12 +56,12 @@ final searchController = TextEditingController();
                   itemBuilder: (context, index) {
                     return InkWell(
                       onTap: (){
-                    //    navigateTo(context, StudentDetail(studentModel: studentCubit.searchStudentModel[index],));
+                        navigateTo(context, StudentDetail(studentModel: studentCubit.searchStudentModel[index],));
                       },
                       child: StudentCard(
                         student: studentCubit.searchStudentModel[index],
                         onDeletePressed: (){
-                        //  studentCubit.deleteStudent(studentCubit.searchStudentModel[index].indexAtDatabase);
+                          studentCubit.deleteStudent(id: studentCubit.searchStudentModel[index].id ?? 0);
                         },
                         onEditPressed: ()async{
                           await showDialog(context: context,

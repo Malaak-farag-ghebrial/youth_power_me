@@ -8,6 +8,7 @@ import '../../../../core/constants/app_strings.dart';
 import '../../../controller/week_cubit/week_cubit.dart';
 import '../widgets/add_week_dialog.dart';
 import '../widgets/week_card.dart';
+import 'attendance/week_activity.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -48,7 +49,7 @@ class MainScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return InkWell(
                       onTap: (){
-                       // navigateTo(context, WeekActivity(weekModel: weekCubit.weekModel[index]));
+                        navigateTo(context, WeekActivity(weekModel: weekCubit.weekModel[index]));
                       },
                       child: WeekCard(
                         week: weekCubit.weekModel[index],

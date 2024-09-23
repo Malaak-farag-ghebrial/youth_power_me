@@ -16,7 +16,6 @@ import '../../../controller/activity_cubit/activity_cubit.dart';
 import '../../../model/activity.dart';
 import '../../../model/times.dart';
 
-
 class AddActivityDialog extends StatelessWidget {
   final ActivityModel? activityModel;
   final bool edit;
@@ -32,7 +31,7 @@ class AddActivityDialog extends StatelessWidget {
     TextEditingController(),
   ];
   final List<Times> times = [
-     Times(time: '', lastTimeAttend: '', day: '', date: '', id: 0)
+    const Times(time: '', lastTimeAttend: '', day: '', date: '', id: 0)
   ];
 
   AddActivityDialog({super.key, this.activityModel, this.edit = false});
@@ -51,10 +50,8 @@ class AddActivityDialog extends StatelessWidget {
             (index) => TextEditingController()));
         lastTimeController.addAll(List.generate(activityModel!.times.length - 1,
             (index) => TextEditingController()));
-        times.addAll(List.generate(
-            activityModel!.times.length - 1,
-            (index) =>
-                 Times(time: '', lastTimeAttend: '', day: '', date: '')));
+        times.addAll(List.generate(activityModel!.times.length - 1,
+            (index) => const Times(time: '', lastTimeAttend: '', day: '', date: '')));
         for (int i = 0; i < activityModel!.times.length; i++) {
           startDateController[i].text = activityModel!.times[i].date;
           timeController[i].text = activityModel!.times[i].time;
@@ -167,7 +164,8 @@ class AddActivityDialog extends StatelessWidget {
                                     cancelText: AppString.cancel.tr(),
                                   ).then((value) {
                                     if (value != null) {
-                                      startDateController[index].text = dateFormat(value);
+                                      startDateController[index].text =
+                                          dateFormat(value);
                                       times[index] = Times(
                                         time: timeController[index].text,
                                         lastTimeAttend:
@@ -285,7 +283,7 @@ class AddActivityDialog extends StatelessWidget {
                         timeController.add(TextEditingController());
                         lastTimeController.add(TextEditingController());
                         startDateController.add(TextEditingController());
-                        times.add( Times(
+                        times.add(const Times(
                             time: '', lastTimeAttend: '', day: '', date: ''));
                         ActivityCubit.get(context).addTimeField();
                       },
@@ -305,47 +303,57 @@ class AddActivityDialog extends StatelessWidget {
                 ],
               ),
             ),
+            // TypeAheadField<Servant>(
+            //   itemBuilder: (context, servant) {
+            //     return Text(servant.name);
+            //   },
+            //   onSelected: (servant) {},
+            //   suggestionsCallback: (pattern) {
+            //
+            //   },
+            // ),
           ],
         ),
         accept: () {
           if (nameController.text.isNotEmpty && times.isNotEmpty) {
-            // if (edit) {
-            //   activityCubit.editActivity(
-            //     name: nameController.text,
-            //     available: activityCubit.available,
-            //     repeated: activityCubit.repeated,
-            //     points: int.tryParse(pointController.text) ?? 0,
-            //     times: List.from(
-            //       times.map(
-            //         (e) => Times(
-            //           time: arabicToEnglish(e.time),
-            //           lastTimeAttend: arabicToEnglish(e.lastTimeAttend),
-            //           day: e.day,
-            //           date: arabicToEnglish(e.date),
-            //         ),
-            //       ),
-            //     ),
-            //     index: activityModel!.indexAtDatabase,
-            //   );
-            // } else {
-            //   ActivityCubit.get(context).addActivity(
-            //     name: nameController.text,
-            //     points: int.tryParse(pointController.text) ?? 0,
-            //     times: List.from(
-            //       times.map(
-            //         (e) => Times(
-            //           time: arabicToEnglish(e.time),
-            //           lastTimeAttend: arabicToEnglish(e.lastTimeAttend),
-            //           day: e.day,
-            //           date: arabicToEnglish(e.date),
-            //         ),
-            //       ),
-            //     ),
-            //     available: activityCubit.available,
-            //     repeated: activityCubit.repeated,
-            //     attendance: [],
-            //   );
-            // }
+            if (edit) {
+              activityCubit.updateActivity(
+                name: nameController.text,
+                available: activityCubit.available,
+                repeated: activityCubit.repeated,
+                points: int.tryParse(pointController.text) ?? 0,
+                servants: [],
+                times: List.from(
+                  times.map(
+                    (e) => Times(
+                      time: arabicToEnglish(e.time),
+                      lastTimeAttend: arabicToEnglish(e.lastTimeAttend),
+                      day: e.day,
+                      date: arabicToEnglish(e.date),
+                    ),
+                  ),
+                ),
+                id: activityModel!.id ?? 0,
+              );
+            } else {
+              ActivityCubit.get(context).addActivity(
+                name: nameController.text,
+                points: int.tryParse(pointController.text) ?? 0,
+                times: List.from(
+                  times.map(
+                    (e) => Times(
+                      time: arabicToEnglish(e.time),
+                      lastTimeAttend: arabicToEnglish(e.lastTimeAttend),
+                      day: e.day,
+                      date: arabicToEnglish(e.date),
+                    ),
+                  ),
+                ),
+                servant: [],
+                available: activityCubit.available,
+                repeated: activityCubit.repeated,
+              );
+            }
             pop(context);
           } else {
             MyToast(msg: AppString.empty_field, state: ToastStates.WARNING);

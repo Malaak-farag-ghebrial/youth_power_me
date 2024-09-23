@@ -4,6 +4,7 @@ class ApiKey {
   static const String firebaseId = "firebase_id";
   static const String name = 'name';
   static const String servant = 'servant';
+  static const String servantId = 'servant_id';
   static const String email = 'email';
   static const String status = 'status';
   static const String image = 'image';

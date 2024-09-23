@@ -1,9 +1,7 @@
+import 'dart:convert';
 import 'dart:math';
-
 import 'package:equatable/equatable.dart';
-import 'package:uuid/uuid.dart';
 import '../../core/constants/api_keyword.dart';
-import 'activity.dart';
 import 'attendance.dart';
 import 'points.dart';
 
@@ -13,9 +11,9 @@ class StudentModel extends Equatable {
     final String? barCode;
     final String name;
     final String? phone;
-    final List<Points> points;
-    final List<Attendance> attendance;
-    final List<String> activityIDs;
+     List<Points>? points;
+     List<Attendance>? attendance;
+     List<String>? activityIDs;
 
   // final List<ActivityModel> activities;
   //final String gender;
@@ -23,18 +21,18 @@ class StudentModel extends Equatable {
 
   final String birthDate;
 
-  const StudentModel({
+   StudentModel({
     required this.id,
     required this.code,
     this.barCode,
     required this.name,
     this.phone,
-    required this.points,
+     this.points,
     //required this.gender,
-    required this.activityIDs,
+     this.activityIDs  ,
     // required this.activities,
     this.academicYear,
-    required this.attendance,
+     this.attendance,
     required this.birthDate,
   });
 
@@ -126,24 +124,23 @@ class StudentModel extends Equatable {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data[ApiKey.id] = id;
     data[ApiKey.code] = code;
     data[ApiKey.name] = name;
-    data[ApiKey.points] = points.map((e) => Points(
+    data[ApiKey.points] = jsonEncode(points?.map((e) => Points(
       id: e.id,
         activityId: e.activityId,
         weekId: e.weekId,
-        value: e.value,).toJson()).toList();
+        value: e.value,).toJson()).toList());
     data[ApiKey.phone] = phone;
-    data[ApiKey.attendance] = attendance.map((e) => Attendance(
+    data[ApiKey.attendance] = jsonEncode(attendance?.map((e) => Attendance(
       id: e.id,
           studentId: e.studentId,
           activityId: e.activityId,
           attend: e.attend,
           date: e.date,
           attendTime: e.attendTime,
-        ).toJson()).toList();
-    data[ApiKey.activityIds] = activityIDs.map((e) => e).toList();
+        ).toJson()).toList());
+    data[ApiKey.activityIds] = jsonEncode(activityIDs?.map((e) => e).toList());
     data[ApiKey.academicYear] = academicYear;
     data[ApiKey.birthDate] = birthDate;
     return data;
@@ -156,10 +153,10 @@ class StudentModel extends Equatable {
       barCode: json[ApiKey.barCode] ?? '',
       name: json[ApiKey.name],
       phone: json[ApiKey.phone],
-      points: List<Points>.from(json[ApiKey.points].map((e)=> Points.fromJson(e))),
-      activityIDs: List<String>.from(json[ApiKey.activityIds].map((e)=>e)),
+      points: List<Points>.from(jsonDecode(json[ApiKey.points]).map((e)=> Points.fromJson(e))),
+      activityIDs: List<String>.from(jsonDecode(json[ApiKey.activityIds]).map((e)=>e)),
       academicYear: json[ApiKey.academicYear],
-      attendance: List<Attendance>.from(json[ApiKey.attendance].map((e)=>Attendance.fromJson(e))),
+      attendance: List<Attendance>.from(jsonDecode(json[ApiKey.attendance]).map((e)=>Attendance.fromJson(e))),
       birthDate: json[ApiKey.birthDate],
     );
   }

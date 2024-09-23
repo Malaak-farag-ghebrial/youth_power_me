@@ -50,9 +50,9 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context)=> HomeCubit()..createDatabase()),
-        BlocProvider(create: (context)=> ActivityCubit()),
-        BlocProvider(create: (context)=> StudentCubit()),
-        BlocProvider(create: (context)=> WeekCubit()),
+        BlocProvider(create: (context)=> ActivityCubit()..getActivity()),
+        BlocProvider(create: (context)=> StudentCubit()..getStudent()),
+        BlocProvider(create: (context)=> WeekCubit()..getWeek()),
         BlocProvider(create: (context)=>SettingCubit()),
       ],
       child: MaterialApp(

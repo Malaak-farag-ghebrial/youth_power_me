@@ -32,7 +32,7 @@ class StudentDetail extends StatelessWidget {
       var studentCubit = StudentCubit.get(context);
       List<ActivityModel> activity = [];
       List<ActivityModel> act = [];
-      for (var item in studentModel.activityIDs) {
+      for (var item in studentModel.activityIDs ?? []) {
         ActivityCubit.get(context).activityModel.firstWhereOrNull((element) {
           if (element.id == item) {
             GlobalFunction.print(element.name);
@@ -41,7 +41,7 @@ class StudentDetail extends StatelessWidget {
           return element.id == item;
         });
       }
-      for (var i in studentModel.points) {
+      for (var i in studentModel.points ?? []) {
         GlobalFunction.print(studentModel.points.toString(), name: 'points');
         ActivityCubit.get(context).activityModel.firstWhereOrNull((element) {
           if (element.id == i.activityId) {
@@ -121,8 +121,8 @@ class StudentDetail extends StatelessWidget {
                             Expanded(
                               child: InkWell(
                                 onTap: () {
-                                  // StudentCubit.get(context).deleteStudent(
-                                  //     studentModel.indexAtDatabase);
+                                  StudentCubit.get(context).deleteStudent(
+                                    id:  studentModel.id);
                                   pop(context);
                                 },
                                 child: SmallChip(
@@ -140,14 +140,13 @@ class StudentDetail extends StatelessWidget {
                             ),
                             Expanded(
                               child: InkWell(
-                                onTap: () async {
-                                  await showDialog(
+                                onTap: ()  async{
+                                 await  showDialog(
                                     context: context,
                                     builder: (context) {
                                       return AddStudentDialog(
                                         edit: true,
-                                        student: studentCubit.studentModel[
-                                            studentModel.id],
+                                        student: studentCubit.studentModel.firstWhere((e)=> e.id == studentModel.id),
                                       );
                                     },
                                   );
@@ -187,13 +186,13 @@ class StudentDetail extends StatelessWidget {
                                           icon: AppIcons.circle,
                                           cardName: act[index].name,
                                           restCard: Text(
-                                            studentModel.points[index].value
+                                            studentModel.points![index].value
                                                 .toString(),
                                           ),
                                         );
                                       },
                                       shrinkWrap: true,
-                                      itemCount: studentModel.points.length,
+                                      itemCount: studentModel.points!.length,
                                     ),
                                     Row(
                                       children: [
@@ -462,7 +461,7 @@ class StudentDetail extends StatelessWidget {
                                         icon: AppIcons.circle,
                                         cardName: act[index].name,
                                         restCard: Text(
-                                          studentModel.points[index].value
+                                          studentModel.points![index].value
                                               .toString(),
                                         ),
                                       );

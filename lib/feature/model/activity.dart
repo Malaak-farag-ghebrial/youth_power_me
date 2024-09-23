@@ -1,31 +1,32 @@
 
 
+import 'dart:convert';
+
 import 'package:equatable/equatable.dart';
-import 'servant.dart';
 import 'times.dart';
 
 import '../../core/constants/api_keyword.dart';
 import 'attendance.dart';
 
 class ActivityModel extends Equatable {
-  final String id;
+  final int? id;
   final String name;
-  final List<String> servant;
+  final List<String> servantId;
   final int points;
   final List<Times> times;
   final bool available;
   final bool repeated;
-  final List<Attendance> attendance;
+  List<Attendance>? attendance;
 
-   const ActivityModel({
-    required this.id,
+    ActivityModel({
+     this.id,
     required this.name,
-     this.servant = const[],
+     this.servantId = const[],
      this.points = 0,
     required this.times,
      this.available = true,
     required this.repeated,
-    required this.attendance,
+     this.attendance,
   });
 
   // ActivityModel decrementIndexAtDataBase() {
@@ -62,22 +63,20 @@ class ActivityModel extends Equatable {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data[ApiKey.id] = id;
     data[ApiKey.name] = name;
     data[ApiKey.points] = points;
-    data[ApiKey.servant] = servant.map((e)=> e);
-    data[ApiKey.times] = times
+    data[ApiKey.servantId] = jsonEncode(servantId.map((e)=> e).toList());
+    data[ApiKey.times] = jsonEncode(times
         .map((e) => Times(
                 time: e.time,
                 lastTimeAttend: e.lastTimeAttend,
                 day: e.day,
                 date: e.date, id: e.id)
             .toJson())
-        .toList();
-    data[ApiKey.available] = available;
-    data[ApiKey.repeated] = repeated;
-    data[ApiKey.attendance] = attendance
-        .map((e) => Attendance(
+        .toList());
+    data[ApiKey.available] = available ? 1 : 0;
+    data[ApiKey.repeated] = repeated ? 1 : 0;
+    data[ApiKey.attendance] = jsonEncode(attendance?.map((e) => Attendance(
       id: e.id,
                 studentId: e.studentId,
                 activityId: e.activityId,
@@ -85,7 +84,7 @@ class ActivityModel extends Equatable {
                 date: e.date,
                 attendTime: e.attendTime)
             .toJson())
-        .toList();
+        .toList());
     return data;
   }
 
@@ -94,11 +93,12 @@ class ActivityModel extends Equatable {
       id: json[ApiKey.id],
       name: json[ApiKey.name],
       points: json[ApiKey.points],
-      times: List<Times>.from(json[ApiKey.times].map((e) => Times.fromJson(e))),
-      available: json[ApiKey.available],
-      repeated: json[ApiKey.repeated],
+      servantId: List<String>.from(jsonDecode(json[ApiKey.servantId]).map((e)=> e)),
+      times: List<Times>.from(jsonDecode(json[ApiKey.times]).map((e) => Times.fromJson(e))),
+      available: json[ApiKey.available] == 1 ? true : false,
+      repeated: json[ApiKey.repeated] == 1 ? true : false,
       attendance: List<Attendance>.from(
-          json[ApiKey.attendance].map((e) => Attendance.fromJson(e))),
+          jsonDecode(json[ApiKey.attendance]).map((e) => Attendance.fromJson(e))),
     );
   }
 

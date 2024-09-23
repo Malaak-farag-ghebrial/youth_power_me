@@ -8,6 +8,8 @@ class AddActivityLoading extends ActivityState {}
 class AddActivitySuccess extends ActivityState {}
 class AddActivityFailed extends ActivityState {}
 
+class DatabaseFailed extends ActivityState {}
+
 class EditActivityLoading extends ActivityState {}
 class EditActivitySuccess extends ActivityState {}
 class EditActivityFailed extends ActivityState {}

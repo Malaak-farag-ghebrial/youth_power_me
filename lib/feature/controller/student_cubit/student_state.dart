@@ -8,6 +8,8 @@ class AddStudentLoading extends StudentState {}
 class AddStudentSuccess extends StudentState {}
 class AddStudentFailed extends StudentState {}
 
+class DatabaseFailed extends StudentState {}
+
 class AttendStudentLoading extends StudentState {}
 class AttendStudentSuccess extends StudentState {}
 class AttendStudentFailed extends StudentState {}

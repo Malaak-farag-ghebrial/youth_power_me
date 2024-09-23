@@ -10,4 +10,6 @@ class CreateDatabaseLoading extends HomeState {}
 class CreateDatabaseSuccess extends HomeState {}
 class CreateDatabaseFailed extends HomeState {}
 
+class OpenDatabaseSuccess extends HomeState {}
+
 

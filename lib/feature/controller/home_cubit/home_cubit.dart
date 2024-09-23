@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:youth_power/core/constants/api_keyword.dart';
+import 'package:youth_power/core/errors/exceptions.dart';
 import 'package:youth_power/core/functions/global_variable.dart';
 
 import '../../view/activity/screens/activity_screen.dart';
@@ -24,8 +25,9 @@ class HomeCubit extends Cubit<HomeState> {
   ];
   int currentIndex = 0;
 
-  void createDatabase() async {
-    await openDatabase(ApiKey.databasePath, version: 1,
+
+  Future<void> createDatabase() async {
+   final response = await openDatabase(ApiKey.databasePath, version: 1,
         onCreate: (Database data, int version) async {
       emit(CreateDatabaseLoading());
       Batch batch = data.batch();
@@ -34,23 +36,25 @@ class HomeCubit extends Cubit<HomeState> {
         (
         ${ApiKey.id} INTEGER PRIMARY KEY,
         ${ApiKey.name} TEXT,
-        ${ApiKey.servant} ARRAY,
+        ${ApiKey.servantId} TEXT,
         ${ApiKey.points} INTEGER,
-        ${ApiKey.times} ARRAY,
+        ${ApiKey.times} TEXT,
         ${ApiKey.available} INTEGER,
         ${ApiKey.repeated} INTEGER,
-        ${ApiKey.attendance} ARRAY)
+        ${ApiKey.attendance} TEXT)
         ''');
       batch.execute('''
         CREATE TABLE ${ApiKey.studentTable} 
         (
         ${ApiKey.id} INTEGER PRIMARY KEY,
-        ${ApiKey.code} INTEGER,
+        ${ApiKey.code} TEXT,
         ${ApiKey.name} TEXT,
         ${ApiKey.phone} TEXT,
-        ${ApiKey.points} ARRAY,
-        ${ApiKey.attendance} ARRAY,
-        ${ApiKey.activity} ARRAY)
+        ${ApiKey.points} TEXT,
+        ${ApiKey.attendance} TEXT,
+        ${ApiKey.birthDate} TEXT,
+        ${ApiKey.academicYear} INTEGER,
+        ${ApiKey.activityIds} TEXT)
         ''');
       batch.execute('''
         CREATE TABLE ${ApiKey.weekTable} 
@@ -58,9 +62,19 @@ class HomeCubit extends Cubit<HomeState> {
         ${ApiKey.id} INTEGER PRIMARY KEY,
         ${ApiKey.date} TEXT,
         ${ApiKey.day} TEXT,
-        ${ApiKey.activity} ARRAY,
-        ${ApiKey.attendance} ARRAY)
+        ${ApiKey.activityIds} TEXT,
+        ${ApiKey.attendance} TEXT)
         ''');
+      batch.execute('''
+      CREATE TABLE ${ApiKey.servantTable}
+      (
+      ${ApiKey.id} INTEGER PRIMARY KEY,
+      ${ApiKey.code} TEXT,
+      ${ApiKey.phone} TEXT,
+      ${ApiKey.name} TEXT,
+      ${ApiKey.attendance} TEXT,
+      ${ApiKey.activityIds} TEXT)
+      ''');
       batch.execute('''
         CREATE TABLE ${ApiKey.timeTable}
         (
@@ -74,8 +88,8 @@ class HomeCubit extends Cubit<HomeState> {
         CREATE TABLE ${ApiKey.pointTable}
         (
         ${ApiKey.id} INTEGER PRIMARY KEY,
-        ${ApiKey.activityId} ARRAY,
-        ${ApiKey.week} ARRAY,
+        ${ApiKey.activityId} TEXT,
+        ${ApiKey.week} TEXT,
         ${ApiKey.value} INTEGER)
         ''');
       batch.execute('''
@@ -87,17 +101,7 @@ class HomeCubit extends Cubit<HomeState> {
         ${ApiKey.date} TEXT,
         ${ApiKey.attendTime} TEXT)
         ''');
-      batch.execute('''
-      CREATE TABLE ${ApiKey.servantTable}
-      (
-      ${ApiKey.id} INTEGER PRIMARY KEY,
-      ${ApiKey.code} TEXT,
-      ${ApiKey.phone} TEXT,
-      ${ApiKey.name} TEXT,
-      ${ApiKey.attendance} ARRAY,
-      ${ApiKey.activity} ARRAY,
-      )
-      ''');
+
       await batch.commit().then((value) {
         GlobalFunction.print('database created');
         emit(CreateDatabaseSuccess());
@@ -105,7 +109,17 @@ class HomeCubit extends Cubit<HomeState> {
         GlobalFunction.errorPrint(error, 'create database error');
         emit(CreateDatabaseFailed());
       });
-    });
+    },
+      onOpen: (Database? database){
+        GlobalFunction.print('database opened');
+        emit(OpenDatabaseSuccess());
+      }
+    );
+   try{
+     database = response;
+   }on MyDatabaseException catch(error){
+     GlobalFunction.errorPrint(error, 'create database');
+   }
   }
 
   void btmNavBar(int index) {

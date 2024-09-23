@@ -11,6 +11,8 @@ class AddWeekFailed extends WeekState {}
 class AddActivityWeekLoading extends WeekState {}
 class AddActivityWeekSuccess extends WeekState {}
 class AddActivityWeekFailed extends WeekState {}
+
+class DatabaseFailed extends WeekState {}
 class PreAdded extends WeekState {}
 
 class AttendActivityStudentLoading extends WeekState {}

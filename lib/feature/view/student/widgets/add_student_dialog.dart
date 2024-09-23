@@ -30,6 +30,7 @@ class AddStudentDialog extends StatelessWidget {
             nameController.text = student!.name;
             phoneController.text = student!.phone ?? '';
             academicController.text = student!.academicYear.toString();
+            birthDateController.text = student!.birthDate;
           }
           return MyDialog(
             title: AppString.add_student,
@@ -95,21 +96,25 @@ class AddStudentDialog extends StatelessWidget {
                   academicController.text.isNotEmpty) {
                 if (int.tryParse(academicController.text) != null) {
                   if (edit && student != null) {
-                    // StudentCubit.get(context).editStudent(
-                    //   name: nameController.text,
-                    //   phone: phoneController.text,
-                    //   academicYear: int.parse(academicController.text),
-                    //   index: student!.indexAtDatabase,
-                    // );
+                    StudentCubit.get(context).updateStudent(
+                      birthDate: birthDateController.text,
+                      activityId: student!.activityIDs ?? [],
+                      attendance: student!.attendance ?? [],
+                      code: student!.code,
+                      points: student!.points ?? [],
+                      name: nameController.text,
+                      phone: phoneController.text,
+                      academicYear: int.parse(academicController.text),
+                      id: student!.id,
+                    );
                     pop(context);
                   } else {
-                    // StudentCubit.get(context).addStudent(
-                    //   name: nameController.text,
-                    //   phone: phoneController.text,
-                    //   birthDate: birthDateController.text,
-                    //   gender: '',
-                    //   academicYear: int.parse(academicController.text),
-                    // );
+                    StudentCubit.get(context).addStudent(
+                      name: nameController.text,
+                      phone: phoneController.text,
+                      birthDate: birthDateController.text,
+                      academicYear: int.parse(academicController.text),
+                    );
                     pop(context);
                   }
                 }

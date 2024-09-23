@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:youth_power/feature/controller/week_cubit/week_cubit.dart';
 import '../../../../core/component/my_dialog.dart';
 import '../../../../core/component/my_input_field.dart';
 import '../../../../core/component/my_navigator.dart';
@@ -46,13 +47,9 @@ class AddWeekDialog extends StatelessWidget {
           ),
           accept: (){
             if(startDateController.text.isNotEmpty){
-             List<String> activityId = [];
-             // ActivityCubit.get(context).activityModel.forEach((element) {
-             //   activityId.add(element.id);
-             // });
-             //  weekCubit.addWeek(
-             //      dateTime: DateTime.parse(startDateController.text),
-             //  );
+              WeekCubit.get(context).addWeek(
+                  dateTime: DateTime.parse(startDateController.text),
+              );
               pop(context);
             }else{
               MyToast(msg: AppString.empty_field, state: ToastStates.WARNING);
