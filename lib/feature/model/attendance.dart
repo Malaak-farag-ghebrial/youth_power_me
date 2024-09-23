@@ -4,15 +4,13 @@ import 'package:equatable/equatable.dart';
 import '../../core/constants/api_keyword.dart';
 
 class Attendance extends Equatable {
-  final int id;
-  final String studentId;
-  final String activityId;
+  final int studentId;
+  final int activityId;
   final bool attend;
   final String date;
   final String attendTime;
 
   const Attendance({
-    required this.id,
     required this.studentId,
     required this.activityId,
     required this.attend,
@@ -32,7 +30,6 @@ class Attendance extends Equatable {
 
   factory Attendance.fromJson(Map<String, dynamic> json) {
     return Attendance(
-      id: json[ApiKey.id],
       studentId: json[ApiKey.studentId],
       activityId: json[ApiKey.activityId],
       attend: json[ApiKey.attend],
@@ -43,6 +40,5 @@ class Attendance extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
   ];
 }

@@ -4,9 +4,18 @@ abstract class WeekState {}
 
 class WeekInitial extends WeekState {}
 
+class CreateDatabaseLoading extends WeekState {}
+class CreateDatabaseSuccess extends WeekState {}
+class CreateDatabaseFailed extends WeekState {}
+
+class OpenDatabaseSuccess extends WeekState {}
 class AddWeekLoading extends WeekState {}
 class AddWeekSuccess extends WeekState {}
 class AddWeekFailed extends WeekState {}
+
+class EditWeekLoading extends WeekState {}
+class EditWeekSuccess extends WeekState {}
+class EditWeekFailed extends WeekState {}
 
 class AddActivityWeekLoading extends WeekState {}
 class AddActivityWeekSuccess extends WeekState {}
@@ -18,6 +27,10 @@ class PreAdded extends WeekState {}
 class AttendActivityStudentLoading extends WeekState {}
 class AttendActivityStudentSuccess extends WeekState {}
 class AttendActivityStudentFailed extends WeekState {}
+
+class RemoveActivityStudentLoading extends WeekState {}
+class RemoveActivityStudentSuccess extends WeekState {}
+class RemoveActivityStudentFailed extends WeekState {}
 
 class IsStudentAttendLoading extends WeekState {}
 class IsStudentAttendSuccess extends WeekState {}

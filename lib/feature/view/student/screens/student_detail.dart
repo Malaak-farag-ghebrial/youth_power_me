@@ -1,7 +1,10 @@
 import 'package:collection/collection.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:youth_power/core/functions/calculate_difference_to_birthdate.dart';
+import '../../../../core/component/shadow_box.dart';
 import '../../../../core/constants/enums.dart';
 import '../../../../core/component/my_chip.dart';
 import '../../../../core/component/my_dialog.dart';
@@ -180,6 +183,7 @@ class StudentDetail extends StatelessWidget {
                                 widget: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
+                                    const MyText(AppString.under_development),
                                     ListView.builder(
                                       itemBuilder: (context, index) {
                                         return MenuCard(
@@ -194,9 +198,9 @@ class StudentDetail extends StatelessWidget {
                                       shrinkWrap: true,
                                       itemCount: studentModel.points!.length,
                                     ),
-                                    Row(
+                                    const Row(
                                       children: [
-                                        const Expanded(
+                                        Expanded(
                                           child: MyText(
                                             AppString.total,
                                           ),
@@ -213,35 +217,61 @@ class StudentDetail extends StatelessWidget {
                           );
                         },
                       ),
-                      MenuCard(
-                        icon: AppIcons.activity,
-                        cardName: AppString.activity,
-                        onTap: () async {
-                          await showDialog(
-                            context: context,
-                            builder: (context) {
-                              return MyDialog(
-                                title: AppString.activity,
-                                widget: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ListView.builder(
-                                      itemBuilder: (context, index) {
-                                        return MenuCard(
-                                          icon: AppIcons.circle,
-                                          cardName: activity[index].name,
-                                          restCard: const SizedBox(),
-                                        );
-                                      },
-                                      shrinkWrap: true,
-                                      itemCount: activity.length,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
+                      // MenuCard(
+                      //   icon: AppIcons.activity,
+                      //   cardName: AppString.activity,
+                      //   onTap: () async {
+                      //     await showDialog(
+                      //       context: context,
+                      //       builder: (context) {
+                      //         return MyDialog(
+                      //           title: AppString.activity,
+                      //           widget: Column(
+                      //             mainAxisSize: MainAxisSize.min,
+                      //             children: [
+                      //               ListView.builder(
+                      //                 itemBuilder: (context, index) {
+                      //                   return MenuCard(
+                      //                     icon: AppIcons.circle,
+                      //                     cardName: activity[index].name,
+                      //                     restCard: const SizedBox(),
+                      //                   );
+                      //                 },
+                      //                 shrinkWrap: true,
+                      //                 itemCount: activity.length,
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         );
+                      //       },
+                      //     );
+                      //   },
+                      // ),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            boxShadow: boxShadow(),
+                            color: AppColors.primaryColorLight,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 15),
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Row(
+                                children: [
+                                  const Icon(AppIcons.birth_date,),
+                                  const SizedBox(width: 10,),
+                                  Expanded(child: MyText(AppString.birth_date,style: Theme.of(context).textTheme.titleMedium),),
+                                  Text(studentModel.birthDate),
+                                ],
+                              ),
+                              subtitle:  Text('${difference(studentModel.birthDate)} ${tr('day')}'),
+                            ),
+                          ),
+                        ),
                       ),
                       AttendCaller(studentModel: studentModel),
                       QRCode(studentModel: studentModel,device: device,),

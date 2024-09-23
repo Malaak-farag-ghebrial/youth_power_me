@@ -29,7 +29,6 @@ class Servant extends Equatable {
     data[ApiKey.phone] = phone;
     data[ApiKey.attendance] = attendance
         .map((e) => Attendance(
-            id: e.id,
             studentId: e.studentId,
             activityId: e.activityId,
             attend: e.attend,

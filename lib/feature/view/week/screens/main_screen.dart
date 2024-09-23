@@ -22,10 +22,7 @@ class MainScreen extends StatelessWidget {
           appBar: AppBar(
             title: MyText(
               AppString.week,
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .titleMedium,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             actions: [
               IconButton(
@@ -40,29 +37,36 @@ class MainScreen extends StatelessWidget {
               )
             ],
           ),
-          body: state is GetWeekLoading ? const MyIndicator() : Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListView.builder(
-                  itemCount: weekCubit.weekModel.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: (){
-                        navigateTo(context, WeekActivity(weekModel: weekCubit.weekModel[index]));
+          body: state is GetWeekLoading
+              ? const MyIndicator()
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListView.builder(
+                      itemCount: weekCubit.weekModel.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onTap: () {
+                            navigateTo(
+                                context,
+                                WeekActivity(
+                                    weekModel: weekCubit.weekModel[index]));
+                          },
+                          child: WeekCard(
+                            week: weekCubit.weekModel[index],
+                            onDeletePressed: () {
+                              weekCubit.deleteWeek(
+                                  id: weekCubit.weekModel[index].id ?? 0);
+                            },
+                          ),
+                        );
                       },
-                      child: WeekCard(
-                        week: weekCubit.weekModel[index],
-                        onDeletePressed: (){
-                        //  weekCubit.deleteWeek(index);
-                        },
-                      ),
-                    );
-                  }),
-            ],
-          ),
+                    ),
+                  ],
+                ),
         );
-      }
+      },
     );
   }
 }

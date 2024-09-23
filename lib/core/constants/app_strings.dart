@@ -20,6 +20,7 @@ class AppString {
   static const String total = 'total';
   static const String add_time = 'add_time';
   static const String academic_year = 'academic_year';
+  static const String under_development = 'under_development';
   static const String ok = 'ok';
   static const String cancel = 'cancel';
   static String points = 'points';

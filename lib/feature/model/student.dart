@@ -12,7 +12,7 @@ class StudentModel extends Equatable {
     final String name;
     final String? phone;
      List<Points>? points;
-     List<Attendance>? attendance;
+     List<Attendance> attendance;
      List<String>? activityIDs;
 
   // final List<ActivityModel> activities;
@@ -32,7 +32,7 @@ class StudentModel extends Equatable {
      this.activityIDs  ,
     // required this.activities,
     this.academicYear,
-     this.attendance,
+     required this.attendance,
     required this.birthDate,
   });
 
@@ -133,7 +133,6 @@ class StudentModel extends Equatable {
         value: e.value,).toJson()).toList());
     data[ApiKey.phone] = phone;
     data[ApiKey.attendance] = jsonEncode(attendance?.map((e) => Attendance(
-      id: e.id,
           studentId: e.studentId,
           activityId: e.activityId,
           attend: e.attend,

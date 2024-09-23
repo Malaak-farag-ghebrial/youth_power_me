@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:youth_power/core/component/my_text.dart';
 import '../../../../../core/component/my_dialog.dart';
 import '../../../../../core/component/my_input_field.dart';
 import '../../../../../core/component/my_indicator.dart';
@@ -12,6 +13,7 @@ import '../../../../../core/constants/app_strings.dart';
 import '../../../../../core/functions/arabic_to_english_number.dart';
 import '../../../../../core/functions/global_variable.dart';
 import '../../../../controller/student_cubit/student_cubit.dart';
+import '../../../../controller/week_cubit/week_cubit.dart';
 import '../../../../model/activity.dart';
 import '../../../../model/week.dart';
 import '../../widgets/attend_student_card.dart';
@@ -47,11 +49,10 @@ class _ActivityAttendanceState extends State<ActivityAttendance> {
   Widget build(BuildContext context) {
     return BlocBuilder<StudentCubit, StudentState>(
 
-    //     buildWhen: (p, n) {
-    //   return n is AddPointStudentSuccess ||
-    //       n is SearchStudentSuccess ||
-    //       n is ScanStudentCodeSuccess;
-    // },
+        buildWhen: (p, n) {
+      return n is SearchStudentSuccess ||
+          n is ScanStudentCodeSuccess;
+    },
         builder: (context, studentState) {
       var studentCubit = StudentCubit.get(context);
       return Scaffold(
@@ -98,9 +99,9 @@ class _ActivityAttendanceState extends State<ActivityAttendance> {
                     maxHeight: 500,
                     accept: () {
                       // WeekCubit.get(context).attendActivityStudent(
-                      //   weekIndex: widget.weekModel.indexAtDatabase,
-                      //   studentId: studentCubit.scannedStudent!.id,
-                      //   actId: widget.activityModel.id,
+                      //   weekId: widget.weekModel.id ?? 0,
+                      //   stId: studentCubit.scannedStudent!.id,
+                      //   actId: widget.activityModel.id ?? 0,
                       //   attendTime: arabicToEnglish(DateFormat('h:mm a').format(DateTime.now()).toString()),
                       // );
                       // studentCubit.attendStudent(
@@ -126,6 +127,7 @@ class _ActivityAttendanceState extends State<ActivityAttendance> {
                             color: AppColors.amber,
                           ),
                         ),
+                        MyText(AppString.under_development,),
                         // SizedBox(
                         //   width: 300,
                         //   height: 300,

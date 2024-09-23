@@ -27,11 +27,11 @@ class WeekActivity extends StatelessWidget {
           actions: [
             IconButton(
                 onPressed: () {
-                  // weekCubit.exportTOExcel(
-                  //     week: weekModel,
-                  //     activity: activityCubit.activityModel,
-                  //     student: StudentCubit.get(context).studentModel,
-                  //     context: context);
+                  weekCubit.exportTOExcel(
+                      week: weekModel,
+                      activity: activityCubit.activityModel,
+                      student: StudentCubit.get(context).studentModel,
+                      context: context);
                 },
                 icon: const Icon(AppIcons.excel)),
           ],

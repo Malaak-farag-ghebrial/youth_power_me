@@ -77,7 +77,6 @@ class ActivityModel extends Equatable {
     data[ApiKey.available] = available ? 1 : 0;
     data[ApiKey.repeated] = repeated ? 1 : 0;
     data[ApiKey.attendance] = jsonEncode(attendance?.map((e) => Attendance(
-      id: e.id,
                 studentId: e.studentId,
                 activityId: e.activityId,
                 attend: e.attend,

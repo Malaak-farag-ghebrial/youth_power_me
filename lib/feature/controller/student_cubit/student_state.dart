@@ -14,6 +14,11 @@ class AttendStudentLoading extends StudentState {}
 class AttendStudentSuccess extends StudentState {}
 class AttendStudentFailed extends StudentState {}
 
+
+class RemoveAttendStudentLoading extends StudentState {}
+class RemoveAttendStudentSuccess extends StudentState {}
+class RemoveAttendStudentFailed extends StudentState {}
+
 class AddPointStudentLoading extends StudentState {}
 class AddPointStudentSuccess extends StudentState {}
 class AddPointStudentFailed extends StudentState {}

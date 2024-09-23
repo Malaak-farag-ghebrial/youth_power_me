@@ -49,21 +49,21 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context)=> HomeCubit()..createDatabase()),
+        BlocProvider(create: (context)=> WeekCubit()..createDatabase()),
+        BlocProvider(create: (context)=> HomeCubit()),
         BlocProvider(create: (context)=> ActivityCubit()..getActivity()),
         BlocProvider(create: (context)=> StudentCubit()..getStudent()),
-        BlocProvider(create: (context)=> WeekCubit()..getWeek()),
-        BlocProvider(create: (context)=>SettingCubit()),
+        BlocProvider(create: (context)=> SettingCubit()),
       ],
       child: MaterialApp(
-        title: 'YOUTH Power',
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
-        theme: light,
-        home:  const HomeLayout(),
-      ),
+            title: 'YOUTH Power',
+            debugShowCheckedModeBanner: false,
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            theme: light,
+            home:  const HomeLayout(),
+          ),
     );
   }
 }

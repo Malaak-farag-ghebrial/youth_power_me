@@ -6,10 +6,6 @@ class HomeInitial extends HomeState {}
 
 class BtmNavBar extends HomeState {}
 
-class CreateDatabaseLoading extends HomeState {}
-class CreateDatabaseSuccess extends HomeState {}
-class CreateDatabaseFailed extends HomeState {}
 
-class OpenDatabaseSuccess extends HomeState {}
 
 

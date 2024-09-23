@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/component/my_toast.dart';
 import '../../../core/constants/api_keyword.dart';
 import '../../../core/errors/exceptions.dart';
+import '../../../core/functions/date_format.dart';
 import '../../../core/functions/global_variable.dart';
 import '../../model/attendance.dart';
 import '../../model/points.dart';
@@ -37,18 +38,19 @@ class StudentCubit extends Cubit<StudentState> {
         batch.insert(
             ApiKey.studentTable,
             StudentModel(
-              id: 0,
-                    code: DateTime.now()
-                        .millisecondsSinceEpoch
-                        .toString()
-                        .substring(7),
-                    name: name,
-                    points: [],
-                    phone: phone,
-                    activityIDs: [],
-                    attendance: [],
-                    academicYear: academicYear,
-                    birthDate: birthDate)
+                id: 0,
+                code: DateTime
+                    .now()
+                    .millisecondsSinceEpoch
+                    .toString()
+                    .substring(7),
+                name: name,
+                points: [],
+                phone: phone,
+                activityIDs: [],
+                attendance: [],
+                academicYear: academicYear,
+                birthDate: birthDate)
                 .toJson());
         await batch.commit();
         emit(AddStudentSuccess());
@@ -135,8 +137,8 @@ class StudentCubit extends Cubit<StudentState> {
           where: '${ApiKey.id}=?',
           whereArgs: [id],
         );
-        studentModel.removeWhere((e)=> e.id == id);
-        searchStudentModel.removeWhere((e)=> e.id == id);
+        studentModel.removeWhere((e) => e.id == id);
+        searchStudentModel.removeWhere((e) => e.id == id);
         emit(DeleteStudentSuccess());
       } on MyDatabaseException catch (error) {
         GlobalFunction.errorPrint(error, 'delete student');
@@ -163,6 +165,85 @@ class StudentCubit extends Cubit<StudentState> {
     emit(SearchStudentSuccess());
   }
 
+  Future<void> attendStudent({
+    required int stId,
+    required int actId,
+    required String attendTime,
+  }) async {
+    emit(AttendStudentLoading());
+    try {
+      StudentModel student = studentModel.firstWhere((e) => e.id == stId);
+      student.attendance.add(Attendance(
+        studentId: stId,
+        activityId: actId,
+        attend: true,
+        date: dateFormat(DateTime.now()),
+        attendTime: attendTime,
+      ));
+      studentModel
+          .firstWhere((e) => e.id == stId)
+          .attendance
+          .add(Attendance(
+        studentId: stId,
+        activityId: actId,
+        attend: true,
+        date: dateFormat(DateTime.now()),
+        attendTime: attendTime,
+      ));
+      searchStudentModel.firstWhere((e) => e.id == stId)
+          .attendance
+          .add(Attendance(
+        studentId: stId,
+        activityId: actId,
+        attend: true,
+        date: dateFormat(DateTime.now()),
+        attendTime: attendTime,
+      ));
+      updateStudent(id: stId,
+          code: student.code,
+          name: student.name,
+          phone: student.phone ?? '',
+          birthDate: student.birthDate,
+          attendance: student.attendance,
+          activityId: [],
+          points: [],
+          academicYear: student.academicYear ?? 0,);
+      emit(AttendStudentSuccess());
+    }catch(error){
+      GlobalFunction.errorPrint(error, 'attend st');
+      emit(AddPointStudentFailed());
+    }
+  }
+
+  Future<void> removeAttendStudent({
+    required int stId,
+    required int actId,
+})async{
+    emit(RemoveAttendStudentLoading());
+    try{
+      StudentModel student = studentModel.firstWhere((e) => e.id == stId);
+      student.attendance.removeWhere((e)=> e.studentId == stId && e.activityId == actId);
+      studentModel
+          .firstWhere((e) => e.id == stId)
+          .attendance.removeWhere((e)=> e.studentId == stId && e.activityId == actId);
+      searchStudentModel.firstWhere((e) => e.id == stId)
+          .attendance.removeWhere((e)=> e.studentId == stId && e.activityId == actId);
+      updateStudent(id: stId,
+        code: student.code,
+        name: student.name,
+        phone: student.phone ?? '',
+        birthDate: student.birthDate,
+        attendance: student.attendance,
+        activityId: [],
+        points: [],
+        academicYear: student.academicYear ?? 0,);
+      emit(RemoveAttendStudentSuccess());
+          }catch(error){
+      GlobalFunction.errorPrint(error, 'remove attend st');
+      emit(RemoveAttendStudentFailed());
+    }
+  }
+
   void scanStudent({required String code}) {
     emit(ScanStudentCodeLoading());
     scannedStudent = studentModel.firstWhereOrNull((element) {
@@ -170,6 +251,7 @@ class StudentCubit extends Cubit<StudentState> {
     });
     emit(ScanStudentCodeSuccess());
   }
+
 
   Future<void> downloadStudent() async {
     try {
@@ -225,11 +307,11 @@ class StudentCubit extends Cubit<StudentState> {
       path: '+2$phone',
     ))) {
       await launchUrl(
-              Uri(
-                scheme: 'tel',
-                path: '+2$phone',
-              ),
-              mode: LaunchMode.externalNonBrowserApplication)
+          Uri(
+            scheme: 'tel',
+            path: '+2$phone',
+          ),
+          mode: LaunchMode.externalNonBrowserApplication)
           .catchError((error) {
         GlobalFunction.errorPrint(error, 'call phone');
         MyToast(msg: error.toString(), state: ToastStates.FAILED);

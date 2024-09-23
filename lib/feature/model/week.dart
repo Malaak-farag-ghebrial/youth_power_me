@@ -55,13 +55,26 @@ class WeekModel extends Equatable {
     data[ApiKey.activityIds] = jsonEncode(activityID.map((e) => e).toList());
     data[ApiKey.attendance] = jsonEncode(attendance
         .map((e) => Attendance(
-              id: e.id,
               studentId: e.studentId,
               activityId: e.activityId,
               attend: e.attend,
               date: e.date,
               attendTime: e.attendTime,
             ).toJson())
+        .toList());
+    return data;
+  }
+
+  Map<String, dynamic> toJsonUpdate() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data[ApiKey.attendance] = jsonEncode(attendance
+        .map((e) => Attendance(
+      studentId: e.studentId,
+      activityId: e.activityId,
+      attend: e.attend,
+      date: e.date,
+      attendTime: e.attendTime,
+    ).toJson())
         .toList());
     return data;
   }
