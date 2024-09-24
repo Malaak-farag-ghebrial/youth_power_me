@@ -53,5 +53,10 @@
   "add_key_first": "Add Keys for Tables first",
   "sheet_name": "Sheet Name",
   "series_number": "Series Number Key",
-  "add_key_warning": "Please, You must add element as It's explained in the Picture"
+  "add_key_warning": "Please, You must add element as It's explained in the Picture",
+  "ago": "ago",
+  "left": "Left",
+  "day": "day",
+  "absent": "The Absents",
+  "birth_date": "Birthdate"
 }

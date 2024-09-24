@@ -9,9 +9,11 @@ import '../../../core/constants/api_keyword.dart';
 import '../../../core/errors/exceptions.dart';
 import '../../../core/functions/date_format.dart';
 import '../../../core/functions/global_variable.dart';
+import '../../model/activity.dart';
 import '../../model/attendance.dart';
 import '../../model/points.dart';
 import '../../model/student.dart';
+import '../../model/week.dart';
 
 part 'student_state.dart';
 
@@ -24,6 +26,7 @@ class StudentCubit extends Cubit<StudentState> {
   List<StudentModel> studentModel = [];
   StudentModel? scannedStudent;
   List<StudentModel> searchStudentModel = [];
+  List<StudentModel> absentStudentModel = [];
 
   Future<void> addStudent({
     required String name,
@@ -38,19 +41,18 @@ class StudentCubit extends Cubit<StudentState> {
         batch.insert(
             ApiKey.studentTable,
             StudentModel(
-                id: 0,
-                code: DateTime
-                    .now()
-                    .millisecondsSinceEpoch
-                    .toString()
-                    .substring(7),
-                name: name,
-                points: [],
-                phone: phone,
-                activityIDs: [],
-                attendance: [],
-                academicYear: academicYear,
-                birthDate: birthDate)
+                    id: 0,
+                    code: DateTime.now()
+                        .millisecondsSinceEpoch
+                        .toString()
+                        .substring(7),
+                    name: name,
+                    points: [],
+                    phone: phone,
+                    activityIDs: [],
+                    attendance: [],
+                    academicYear: academicYear,
+                    birthDate: birthDate)
                 .toJson());
         await batch.commit();
         emit(AddStudentSuccess());
@@ -180,55 +182,25 @@ class StudentCubit extends Cubit<StudentState> {
         date: dateFormat(DateTime.now()),
         attendTime: attendTime,
       ));
-      studentModel
+      studentModel.firstWhere((e) => e.id == stId).attendance.add(Attendance(
+            studentId: stId,
+            activityId: actId,
+            attend: true,
+            date: dateFormat(DateTime.now()),
+            attendTime: attendTime,
+          ));
+      searchStudentModel
           .firstWhere((e) => e.id == stId)
           .attendance
           .add(Attendance(
-        studentId: stId,
-        activityId: actId,
-        attend: true,
-        date: dateFormat(DateTime.now()),
-        attendTime: attendTime,
-      ));
-      searchStudentModel.firstWhere((e) => e.id == stId)
-          .attendance
-          .add(Attendance(
-        studentId: stId,
-        activityId: actId,
-        attend: true,
-        date: dateFormat(DateTime.now()),
-        attendTime: attendTime,
-      ));
-      updateStudent(id: stId,
-          code: student.code,
-          name: student.name,
-          phone: student.phone ?? '',
-          birthDate: student.birthDate,
-          attendance: student.attendance,
-          activityId: [],
-          points: [],
-          academicYear: student.academicYear ?? 0,);
-      emit(AttendStudentSuccess());
-    }catch(error){
-      GlobalFunction.errorPrint(error, 'attend st');
-      emit(AddPointStudentFailed());
-    }
-  }
-
-  Future<void> removeAttendStudent({
-    required int stId,
-    required int actId,
-})async{
-    emit(RemoveAttendStudentLoading());
-    try{
-      StudentModel student = studentModel.firstWhere((e) => e.id == stId);
-      student.attendance.removeWhere((e)=> e.studentId == stId && e.activityId == actId);
-      studentModel
-          .firstWhere((e) => e.id == stId)
-          .attendance.removeWhere((e)=> e.studentId == stId && e.activityId == actId);
-      searchStudentModel.firstWhere((e) => e.id == stId)
-          .attendance.removeWhere((e)=> e.studentId == stId && e.activityId == actId);
-      updateStudent(id: stId,
+            studentId: stId,
+            activityId: actId,
+            attend: true,
+            date: dateFormat(DateTime.now()),
+            attendTime: attendTime,
+          ));
+      updateStudent(
+        id: stId,
         code: student.code,
         name: student.name,
         phone: student.phone ?? '',
@@ -236,9 +208,60 @@ class StudentCubit extends Cubit<StudentState> {
         attendance: student.attendance,
         activityId: [],
         points: [],
-        academicYear: student.academicYear ?? 0,);
+        academicYear: student.academicYear ?? 0,
+      );
+      emit(AttendStudentSuccess());
+    } catch (error) {
+      GlobalFunction.errorPrint(error, 'attend st');
+      emit(AttendStudentFailed());
+    }
+  }
+
+  void filterAbsentStudent({required WeekModel week,required ActivityModel activity}) {
+    emit(FilterAbsentStudentLoading());
+    absentStudentModel.addAll(studentModel.where(((s) =>
+        week.attendance.contains(
+            week.attendance.firstWhereOrNull((a) => a.studentId == s.id && a.activityId == activity.id)))).toList());
+    emit(FilterAbsentStudentSuccess());
+  }
+
+  void removeFilteredAbsentStudent({
+    required StudentModel student,
+}){
+    absentStudentModel.removeWhere((e)=> e.id == student.id);
+    emit(RemoveFilteredAbsentStudentSuccess());
+  }
+
+  Future<void> removeAttendStudent({
+    required int stId,
+    required int actId,
+  }) async {
+    emit(RemoveAttendStudentLoading());
+    try {
+      StudentModel student = studentModel.firstWhere((e) => e.id == stId);
+      student.attendance
+          .removeWhere((e) => e.studentId == stId && e.activityId == actId);
+      studentModel
+          .firstWhere((e) => e.id == stId)
+          .attendance
+          .removeWhere((e) => e.studentId == stId && e.activityId == actId);
+      searchStudentModel
+          .firstWhere((e) => e.id == stId)
+          .attendance
+          .removeWhere((e) => e.studentId == stId && e.activityId == actId);
+      updateStudent(
+        id: stId,
+        code: student.code,
+        name: student.name,
+        phone: student.phone ?? '',
+        birthDate: student.birthDate,
+        attendance: student.attendance,
+        activityId: [],
+        points: [],
+        academicYear: student.academicYear ?? 0,
+      );
       emit(RemoveAttendStudentSuccess());
-          }catch(error){
+    } catch (error) {
       GlobalFunction.errorPrint(error, 'remove attend st');
       emit(RemoveAttendStudentFailed());
     }
@@ -251,7 +274,6 @@ class StudentCubit extends Cubit<StudentState> {
     });
     emit(ScanStudentCodeSuccess());
   }
-
 
   Future<void> downloadStudent() async {
     try {
@@ -307,11 +329,11 @@ class StudentCubit extends Cubit<StudentState> {
       path: '+2$phone',
     ))) {
       await launchUrl(
-          Uri(
-            scheme: 'tel',
-            path: '+2$phone',
-          ),
-          mode: LaunchMode.externalNonBrowserApplication)
+              Uri(
+                scheme: 'tel',
+                path: '+2$phone',
+              ),
+              mode: LaunchMode.externalNonBrowserApplication)
           .catchError((error) {
         GlobalFunction.errorPrint(error, 'call phone');
         MyToast(msg: error.toString(), state: ToastStates.FAILED);

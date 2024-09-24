@@ -161,6 +161,10 @@ class WeekCubit extends Cubit<WeekState> {
         final response = await database!.query(ApiKey.weekTable);
         weekModel =
             List<WeekModel>.from(response.map((e) => WeekModel.fromJson(e)));
+        weekModel.sort((a,b){
+          return DateTime.parse('${b.date} 00:00:00').compareTo(
+              DateTime.parse('${a.date} 00:00:00'));
+        });
         GlobalFunction.print(response.toString(),name: 'weeek get');
         GlobalFunction.print(weekModel[0].attendance.toString(),name: 'weeek get');
         emit(GetWeekSuccess());

@@ -268,7 +268,7 @@ class StudentDetail extends StatelessWidget {
                                   Text(studentModel.birthDate),
                                 ],
                               ),
-                              subtitle:  Text('${difference(studentModel.birthDate)} ${tr('day')}'),
+                              subtitle:  Text('${tr('day')} ${difference(studentModel.birthDate).abs()} ${difference(studentModel.birthDate) > 0 ? tr('left') : tr('ago')}'),
                             ),
                           ),
                         ),

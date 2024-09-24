@@ -1,8 +1,8 @@
-import 'dart:io';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:youth_power/core/component/my_button.dart';
 import 'package:youth_power/core/component/my_text.dart';
+import 'package:youth_power/feature/view/week/screens/attendance/activity_absents.dart';
 import '../../../../../core/component/my_dialog.dart';
 import '../../../../../core/component/my_input_field.dart';
 import '../../../../../core/component/my_indicator.dart';
@@ -10,10 +10,7 @@ import '../../../../../core/component/my_navigator.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/constants/app_icons.dart';
 import '../../../../../core/constants/app_strings.dart';
-import '../../../../../core/functions/arabic_to_english_number.dart';
-import '../../../../../core/functions/global_variable.dart';
 import '../../../../controller/student_cubit/student_cubit.dart';
-import '../../../../controller/week_cubit/week_cubit.dart';
 import '../../../../model/activity.dart';
 import '../../../../model/week.dart';
 import '../../widgets/attend_student_card.dart';
@@ -31,6 +28,7 @@ class ActivityAttendance extends StatefulWidget {
 
 class _ActivityAttendanceState extends State<ActivityAttendance> {
   final searchController = TextEditingController();
+
   // QRViewController? qrViewController;
   // Barcode? barcode;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -47,13 +45,9 @@ class _ActivityAttendanceState extends State<ActivityAttendance> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<StudentCubit, StudentState>(
-
-        buildWhen: (p, n) {
-      return n is SearchStudentSuccess ||
-          n is ScanStudentCodeSuccess;
-    },
-        builder: (context, studentState) {
+    return BlocBuilder<StudentCubit, StudentState>(buildWhen: (p, n) {
+      return n is SearchStudentSuccess || n is ScanStudentCodeSuccess;
+    }, builder: (context, studentState) {
       var studentCubit = StudentCubit.get(context);
       return Scaffold(
         appBar: AppBar(
@@ -69,21 +63,60 @@ class _ActivityAttendanceState extends State<ActivityAttendance> {
               },
               hintText: AppString.search,
             ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: MyOutlinedButton(
+                    textWord: AppString.birth_date,
+                    hasBorder: true,
+                    borderColor: AppColors.primaryColor,
+                    fontSize: 15,
+                    borderWidth: 2,
+                    buttonHeight: 40,
+                    margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    borderRadius: BorderRadius.circular(10),
+                    onTap: () {
+
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: MyOutlinedButton(
+                    textWord: AppString.absent,
+                    fontSize: 15,
+                    hasBorder: true,
+                    borderColor: AppColors.primaryColor,
+                    borderWidth: 2,
+                    buttonHeight: 40,
+                    margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 5),
+                    borderRadius: BorderRadius.circular(10),
+                    onTap: () {
+                      StudentCubit.get(context).filterAbsentStudent(week: widget.weekModel, activity: widget.activityModel);
+                      navigateTo(context, const ActivityAbsents());
+                    },
+                  ),
+                )
+              ],
+            ),
             studentCubit.studentModel.isEmpty ||
                     studentState is GetStudentLoading
                 ? const MyIndicator()
-                : ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: studentCubit.searchStudentModel.length,
-                    itemBuilder: (context, index) {
-                      return AttendanceStudentCard(
-                        studentModel: studentCubit.searchStudentModel[index],
-                        weekModel: widget.weekModel,
-                        activityModel: widget.activityModel,
-                      );
-                    },
-                  ),
-         //   Text(barcode != null ? barcode!.code.toString() : 'barcode data'),
+                : Expanded(
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: studentCubit.searchStudentModel.length,
+                      itemBuilder: (context, index) {
+                        return AttendanceStudentCard(
+                          studentModel: studentCubit.searchStudentModel[index],
+                          weekModel: widget.weekModel,
+                          activityModel: widget.activityModel,
+                        );
+                      },
+                    ),
+                ),
+            //   Text(barcode != null ? barcode!.code.toString() : 'barcode data'),
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
@@ -120,14 +153,16 @@ class _ActivityAttendanceState extends State<ActivityAttendance> {
                       children: [
                         IconButton(
                           onPressed: () async {
-                          //  await qrViewController!.toggleFlash();
+                            //  await qrViewController!.toggleFlash();
                           },
                           icon: const Icon(
                             AppIcons.flash,
                             color: AppColors.amber,
                           ),
                         ),
-                        MyText(AppString.under_development,),
+                        const MyText(
+                          AppString.under_development,
+                        ),
                         // SizedBox(
                         //   width: 300,
                         //   height: 300,

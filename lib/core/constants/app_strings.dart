@@ -34,6 +34,7 @@ class AppString {
   static String repeated = 'repeated';
   static String attend = 'attend';
   static String search = 'search';
+  static String absent = 'absent';
   static String exit_app = 'exit_app';
   static String not_found = 'not_found';
   static String sheetName = 'sheet_name';

@@ -38,10 +38,10 @@ class AttendCaller extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Expanded(
-                        child: MyText(AppString.attendance,
-                            style: Theme.of(context).textTheme.titleMedium),
-                      ),
+                      MyText(AppString.attendance,
+                          style: Theme.of(context).textTheme.titleMedium),
+                      Text(' ( ${WeekCubit.get(context).weekModel.first.date} ) '),
+                      const Spacer(),
                       WeekCubit.get(context).weekModel.isNotEmpty
                           ? WeekCubit.get(context)
                                       .weekModel
