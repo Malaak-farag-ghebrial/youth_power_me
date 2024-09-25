@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/component/my_button.dart';
 import '../../../../core/component/my_input_field.dart';
 import '../../../../core/component/my_navigator.dart';
 import '../../../../core/component/my_text.dart';
+import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../controller/student_cubit/student_cubit.dart';
 import '../widgets/add_student_dialog.dart';
 import '../widgets/student_card.dart';
+import 'nearest_birth_date_list.dart';
 import 'student_detail.dart';
 
 class StudentScreen extends StatelessWidget {
@@ -49,6 +52,29 @@ final searchController = TextEditingController();
                   StudentCubit.get(context).searchStudent(searchWord: value);
                 },
                 hintText: AppString.search,
+              ),
+              MyOutlinedButton(
+                textWord: AppString.birth_date,
+                hasBorder: true,
+                borderColor: AppColors.primaryColor,
+                fontSize: 15,
+                borderWidth: 2,
+                buttonHeight: 40,
+                buttonWidth: 120,
+                margin: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                borderRadius: BorderRadius.circular(10),
+                onTap: () {
+                  StudentCubit.get(context).filterBirthDateStudent(
+                      startTime:
+                      DateTime.now()
+                          .subtract(const Duration(days: 7)),
+                      endTime: DateTime.now()
+                          .add(const Duration(days: 7)));
+
+                  navigateTo(context, NearestBirthDateStudent());
+                },
               ),
               ListView.builder(
                   itemCount: studentCubit.searchStudentModel.length,

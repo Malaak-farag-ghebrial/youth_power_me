@@ -268,7 +268,53 @@ class StudentDetail extends StatelessWidget {
                                   Text(studentModel.birthDate),
                                 ],
                               ),
-                              subtitle:  Text('${tr('day')} ${difference(studentModel.birthDate).abs()} ${difference(studentModel.birthDate) > 0 ? tr('left') : tr('ago')}'),
+                              subtitle:  Row(
+                                children: [
+                                  Visibility(
+                                    visible: difference(studentModel
+                                        .birthDate) == 0,
+                                    child: Expanded(
+                                      child: MyText(
+                                        AppString.today,
+                                        style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                      ),
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: difference(studentModel
+                                        .birthDate) == 1,
+                                    child: Expanded(
+                                      child: MyText(
+                                        AppString.tomorrow,
+                                        style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                      ),
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: difference(studentModel
+                                        .birthDate) == -1,
+                                    child: Expanded(
+                                      child: MyText(
+                                        AppString.yesterday,
+                                        style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                      ),
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: difference(studentModel
+                                        .birthDate).abs() > 1,
+                                    child: Expanded(
+                                      child: MyText(
+                                        '${difference(studentModel.birthDate) > 0 ? tr('left') : tr('ago') } ${difference(studentModel.birthDate).abs()}  ${tr('day')}',
+                                        style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                      ),
+                                    ),
+                                  ),                                ],
+                              ),
                             ),
                           ),
                         ),

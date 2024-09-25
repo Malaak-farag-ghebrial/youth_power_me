@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/foundation.dart';
@@ -65,7 +66,7 @@ class WeekCubit extends Cubit<WeekState> {
         ${ApiKey.id} INTEGER PRIMARY KEY,
         ${ApiKey.date} TEXT,
         ${ApiKey.day} TEXT,
-        ${ApiKey.activityIds} TEXT,
+        ${ApiKey.eftkad} TEXT,
         ${ApiKey.attendance} TEXT)
         ''');
       batch.execute('''
@@ -76,34 +77,34 @@ class WeekCubit extends Cubit<WeekState> {
       ${ApiKey.phone} TEXT,
       ${ApiKey.name} TEXT,
       ${ApiKey.attendance} TEXT,
-      ${ApiKey.activityIds} TEXT)
+      ${ApiKey.eftkad} TEXT)
       ''');
-      batch.execute('''
-        CREATE TABLE ${ApiKey.timeTable}
-        (
-        ${ApiKey.id} INTEGER PRIMARY KEY,
-        ${ApiKey.times} TEXT,
-        ${ApiKey.lastTimeAttend} TEXT,
-        ${ApiKey.day} TEXT,
-        ${ApiKey.date} TEXT)
-        ''');
-      batch.execute('''
-        CREATE TABLE ${ApiKey.pointTable}
-        (
-        ${ApiKey.id} INTEGER PRIMARY KEY,
-        ${ApiKey.activityId} TEXT,
-        ${ApiKey.week} TEXT,
-        ${ApiKey.value} INTEGER)
-        ''');
-      batch.execute('''
-        CREATE TABLE ${ApiKey.attendanceTable} 
-        (
-        ${ApiKey.id} INTEGER PRIMARY KEY,
-        ${ApiKey.studentId} INTEGER,
-        ${ApiKey.activityId} INTEGER,
-        ${ApiKey.date} TEXT,
-        ${ApiKey.attendTime} TEXT)
-        ''');
+      // batch.execute('''
+      //   CREATE TABLE ${ApiKey.timeTable}
+      //   (
+      //   ${ApiKey.id} INTEGER PRIMARY KEY,
+      //   ${ApiKey.times} TEXT,
+      //   ${ApiKey.lastTimeAttend} TEXT,
+      //   ${ApiKey.day} TEXT,
+      //   ${ApiKey.date} TEXT)
+      //   ''');
+      // batch.execute('''
+      //   CREATE TABLE ${ApiKey.pointTable}
+      //   (
+      //   ${ApiKey.id} INTEGER PRIMARY KEY,
+      //   ${ApiKey.activityId} TEXT,
+      //   ${ApiKey.week} TEXT,
+      //   ${ApiKey.value} INTEGER)
+      //   ''');
+      // batch.execute('''
+      //   CREATE TABLE ${ApiKey.attendanceTable}
+      //   (
+      //   ${ApiKey.id} INTEGER PRIMARY KEY,
+      //   ${ApiKey.studentId} INTEGER,
+      //   ${ApiKey.activityId} INTEGER,
+      //   ${ApiKey.date} TEXT,
+      //   ${ApiKey.attendTime} TEXT)
+      //   ''');
 
       await batch.commit().then((value) {
         GlobalFunction.print('database created');
@@ -128,7 +129,7 @@ class WeekCubit extends Cubit<WeekState> {
   Future<void> addWeek({
     required DateTime dateTime,
   }) async {
-    emit(AddActivityWeekLoading());
+    emit(AddWeekLoading());
     if (database != null) {
       Batch batch = database!.batch();
       try {
@@ -139,14 +140,14 @@ class WeekCubit extends Cubit<WeekState> {
                     DateTime.parse(arabicToEnglish(dateTime.toString()))),
                 day: DateFormat('EEEE').format(
                     DateTime.parse(arabicToEnglish(dateTime.toString()))),
-                activityID: [],
+                eftkad: [],
                 attendance: []).toJson());
         await batch.commit();
-        emit(AddActivityWeekSuccess());
+        emit(AddWeekSuccess());
         getWeek();
       } on MyDatabaseException catch (error) {
         GlobalFunction.errorPrint(error, 'add week');
-        emit(AddActivityWeekFailed());
+        emit(AddWeekFailed());
       }
     } else {
       GlobalFunction.errorPrint('$database', 'database is null');
@@ -161,12 +162,12 @@ class WeekCubit extends Cubit<WeekState> {
         final response = await database!.query(ApiKey.weekTable);
         weekModel =
             List<WeekModel>.from(response.map((e) => WeekModel.fromJson(e)));
-        weekModel.sort((a,b){
-          return DateTime.parse('${b.date} 00:00:00').compareTo(
-              DateTime.parse('${a.date} 00:00:00'));
+        weekModel.sort((a, b) {
+          return DateTime.parse('${b.date} 00:00:00')
+              .compareTo(DateTime.parse('${a.date} 00:00:00'));
         });
-        GlobalFunction.print(response.toString(),name: 'weeek get');
-        GlobalFunction.print(weekModel[0].attendance.toString(),name: 'weeek get');
+        GlobalFunction.print(response.toString(), name: 'weeek get');
+        //  GlobalFunction.print(weekModel[0].attendance.toString(),name: 'weeek get');
         emit(GetWeekSuccess());
       } on MyDatabaseException catch (error) {
         GlobalFunction.errorPrint(error, 'get week');
@@ -180,19 +181,18 @@ class WeekCubit extends Cubit<WeekState> {
 
   Future<void> updateWeek({
     required WeekModel week,
-    required List<Attendance> attend,
   }) async {
     emit(EditWeekLoading());
     if (database != null) {
       Batch batch = database!.batch();
       try {
-        GlobalFunction.print(week.attendance.toString(),name: 'update 1');
+        GlobalFunction.print(week.attendance.toString(), name: 'update 1');
         batch.update(
           ApiKey.weekTable,
           WeekModel(
             date: week.date,
             day: week.day,
-            activityID: week.activityID,
+            eftkad: week.eftkad,
             attendance: week.attendance,
           ).toJsonUpdate(),
           where: '${ApiKey.id}=?',
@@ -239,8 +239,8 @@ class WeekCubit extends Cubit<WeekState> {
     required String attendTime,
   }) async {
     emit(AttendActivityStudentLoading());
-    try{
-      WeekModel week = weekModel.firstWhere((e)=> e.id == weekId);
+    try {
+      WeekModel week = weekModel.firstWhere((e) => e.id == weekId);
       week.attendance.add(Attendance(
         studentId: stId,
         activityId: actId,
@@ -249,17 +249,32 @@ class WeekCubit extends Cubit<WeekState> {
         attendTime: attendTime,
       ));
       weekModel.firstWhere((e) => e.id == weekId).attendance.add(Attendance(
-        studentId: stId,
-        activityId: actId,
-        attend: true,
-        date: dateFormat(DateTime.now()),
-        attendTime: attendTime,
-      ));
-      updateWeek(week: week, attend: week.attendance);
+            studentId: stId,
+            activityId: actId,
+            attend: true,
+            date: dateFormat(DateTime.now()),
+            attendTime: attendTime,
+          ));
+      updateWeek(week: week);
       emit(AttendActivityStudentSuccess());
-    }catch(error){
+    } catch (error) {
       GlobalFunction.errorPrint(error, 'attend act st');
       emit(AttendActivityStudentFailed());
+    }
+  }
+
+  Future<void> missAbsentStudent(
+      {required int weekId, required int studentId}) async {
+    emit(MissAbsentStudentLoading());
+    try {
+      WeekModel week = weekModel.firstWhere((e) => e.id == weekId);
+      week.eftkad.add(studentId);
+      weekModel.firstWhere((e) => e.id == weekId).eftkad.add(studentId);
+      updateWeek(week: week);
+      emit(MissAbsentStudentSuccess());
+    } catch (error) {
+      GlobalFunction.errorPrint(error, 'miss abs st');
+      emit(MissAbsentStudentFailed());
     }
   }
 
@@ -267,31 +282,56 @@ class WeekCubit extends Cubit<WeekState> {
     required int weekId,
     required int actId,
     required int stId,
-})async{
+  }) async {
     emit(RemoveActivityStudentLoading());
-    try{
-      WeekModel week = weekModel.firstWhere((e)=> e.id == weekId);
-      week.attendance.removeWhere((e)=> e.studentId == stId && e.activityId == actId);
-      weekModel.firstWhere((e) => e.id == weekId).attendance.removeWhere((e)=> e.studentId == stId && e.activityId == actId);
-      updateWeek(week: week, attend: week.attendance);
+    try {
+      WeekModel week = weekModel.firstWhere((e) => e.id == weekId);
+      week.attendance
+          .removeWhere((e) => e.studentId == stId && e.activityId == actId);
+      weekModel
+          .firstWhere((e) => e.id == weekId)
+          .attendance
+          .removeWhere((e) => e.studentId == stId && e.activityId == actId);
+      updateWeek(week: week);
       emit(RemoveActivityStudentSuccess());
-    }catch(error){
+    } catch (error) {
       GlobalFunction.errorPrint(error, 'remove attend act st');
       emit(RemoveActivityStudentFailed());
+    }
+  }
+
+  Future<void> removeMissAbsentStudent({
+    required int weekId,
+    required int studentId,
+  }) async {
+    emit(RemoveMissAbsentStudentLoading());
+    try {
+      WeekModel week = weekModel.firstWhere((e) => e.id == weekId);
+      week.eftkad.removeWhere((e) => e == studentId);
+      weekModel
+          .firstWhere((e) => e.id == weekId)
+          .eftkad
+          .removeWhere((e) => e == studentId);
+      updateWeek(week: week);
+      emit(RemoveMissAbsentStudentSuccess());
+    } catch (error) {
+      GlobalFunction.errorPrint(error, 'remove absent st');
+      emit(RemoveMissAbsentStudentFailed());
     }
   }
 
   Future<void> downloadWeek() async {
     try {
       final response = await _fireStore.collection(ApiKey.weekTable).get();
-      weekModel = List<WeekModel>.from(response.docs
+      List<WeekModel> week = List<WeekModel>.from(response.docs
           .map((e) => e.data()[ApiKey.week])
           .toList()[0]
           .map((e) => WeekModel.fromJson(e))).toList();
-      weekModel.sort((a, b) {
-        return DateTime.parse('${b.date} 00:00:00')
-            .compareTo(DateTime.parse('${a.date} 00:00:00'));
-      });
+      for (var e in week) {
+        if(week.firstWhereOrNull((w)=> w.date == e.date) == null) {
+          addWeek(dateTime: DateTime.parse(e.date));
+        }
+      }
     } catch (error) {
       GlobalFunction.errorPrint(error, 'download week');
     }

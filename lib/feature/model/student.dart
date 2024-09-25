@@ -132,7 +132,7 @@ class StudentModel extends Equatable {
         weekId: e.weekId,
         value: e.value,).toJson()).toList());
     data[ApiKey.phone] = phone;
-    data[ApiKey.attendance] = jsonEncode(attendance?.map((e) => Attendance(
+    data[ApiKey.attendance] = jsonEncode(attendance.map((e) => Attendance(
           studentId: e.studentId,
           activityId: e.activityId,
           attend: e.attend,
@@ -147,7 +147,7 @@ class StudentModel extends Equatable {
 
   factory StudentModel.fromJson(Map<String, dynamic> json) {
     return StudentModel(
-      id: json[ApiKey.id],
+      id: json[ApiKey.id] ?? 0,
       code: json[ApiKey.code],
       barCode: json[ApiKey.barCode] ?? '',
       name: json[ApiKey.name],

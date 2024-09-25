@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
+import 'package:excel/excel.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -140,10 +142,16 @@ class ActivityCubit extends Cubit<ActivityState> {
   Future<void> downloadActivity() async {
     try {
       final response = await _fireStore.collection(ApiKey.activityTable).get();
-      activityModel = List<ActivityModel>.from(response.docs
+      List<ActivityModel> act = List<ActivityModel>.from(response.docs
           .map((e) => e.data()[ApiKey.activity])
           .toList()[0]
           .map((e) => ActivityModel.fromJson(e)));
+      for (var e in act) {
+        if(act.firstWhereOrNull((a)=> a.name == e.name) == null){
+          addActivity(name: e.name, available: e.available, repeated: e.repeated, times: e.times, servant: []);
+        }
+      }
+      getActivity();
       GlobalFunction.print(activityModel.toString());
     } catch (error) {
       GlobalFunction.errorPrint(error, 'download activity');

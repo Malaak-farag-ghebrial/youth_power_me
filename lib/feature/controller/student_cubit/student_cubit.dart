@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:youth_power/core/functions/calculate_difference_to_birthdate.dart';
 
 import '../../../core/component/my_toast.dart';
 import '../../../core/constants/api_keyword.dart';
@@ -27,6 +28,7 @@ class StudentCubit extends Cubit<StudentState> {
   StudentModel? scannedStudent;
   List<StudentModel> searchStudentModel = [];
   List<StudentModel> absentStudentModel = [];
+  List<StudentModel> birthDateStudentModel = [];
 
   Future<void> addStudent({
     required String name,
@@ -76,6 +78,8 @@ class StudentCubit extends Cubit<StudentState> {
             response.map((e) => StudentModel.fromJson(e)));
         searchStudentModel = List<StudentModel>.from(
             response.map((e) => StudentModel.fromJson(e)));
+        // absentStudentModel = List<StudentModel>.from(
+        //     response.map((e) => StudentModel.fromJson(e)));
         emit(GetStudentSuccess());
       } on MyDatabaseException catch (error) {
         GlobalFunction.errorPrint(error, 'get student');
@@ -217,19 +221,50 @@ class StudentCubit extends Cubit<StudentState> {
     }
   }
 
-  void filterAbsentStudent({required WeekModel week,required ActivityModel activity}) {
+  void filterAbsentStudent(
+      {required WeekModel week, required ActivityModel activity}) {
     emit(FilterAbsentStudentLoading());
-    absentStudentModel.addAll(studentModel.where(((s) =>
-        week.attendance.contains(
-            week.attendance.firstWhereOrNull((a) => a.studentId == s.id && a.activityId == activity.id)))).toList());
+    absentStudentModel = studentModel
+        .where((s) => !week.attendance.contains(week.attendance
+            .firstWhereOrNull(
+                (a) => a.studentId == s.id && a.activityId == activity.id)))
+        .toList();
+    GlobalFunction.print(absentStudentModel.toString());
     emit(FilterAbsentStudentSuccess());
   }
 
-  void removeFilteredAbsentStudent({
-    required StudentModel student,
-}){
-    absentStudentModel.removeWhere((e)=> e.id == student.id);
-    emit(RemoveFilteredAbsentStudentSuccess());
+  void filterBirthDateStudent(
+      {required DateTime startTime, required DateTime endTime}) async {
+    emit(FilterBirthDateStudentLoading());
+    birthDateStudentModel = studentModel
+        .where((s) =>
+            (DateTime(DateTime.now().year, DateTime.parse(s.birthDate).month,
+                        DateTime.parse(s.birthDate).day)
+                    .isAfter(startTime) &&
+                DateTime(DateTime.now().year, DateTime.parse(s.birthDate).month,
+                        DateTime.parse(s.birthDate).day)
+                    .isBefore(endTime)) ||
+            DateTime(DateTime.now().year, DateTime.parse(s.birthDate).month,
+                    DateTime.parse(s.birthDate).day)
+                .isAtSameMomentAs(startTime) ||
+            DateTime(DateTime.now().year, DateTime.parse(s.birthDate).month,
+                    DateTime.parse(s.birthDate).day)
+                .isAtSameMomentAs(endTime))
+        .toList();
+    birthDateStudentModel.sort((a, b) {
+      return difference(DateTime(
+                  DateTime.now().year,
+                  DateTime.parse(b.birthDate).month,
+                  DateTime.parse(b.birthDate).day)
+              .toString())
+          .compareTo(difference(DateTime(
+                  DateTime.now().year,
+                  DateTime.parse(a.birthDate).month,
+                  DateTime.parse(a.birthDate).day)
+              .toString()));
+    });
+    GlobalFunction.print(birthDateStudentModel.toString());
+    emit(FilterBirthDateStudentSuccess());
   }
 
   Future<void> removeAttendStudent({
@@ -278,14 +313,16 @@ class StudentCubit extends Cubit<StudentState> {
   Future<void> downloadStudent() async {
     try {
       final response = await _fireStore.collection(ApiKey.studentTable).get();
-      studentModel = List<StudentModel>.from(response.docs
+      List<StudentModel> st = List<StudentModel>.from(response.docs
           .map((e) => e.data()[ApiKey.student])
           .toList()[0]
           .map((e) => StudentModel.fromJson(e)));
-      searchStudentModel = List<StudentModel>.from(response.docs
-          .map((e) => e.data()[ApiKey.student])
-          .toList()[0]
-          .map((e) => StudentModel.fromJson(e)));
+      for (var e in st) {
+        if(st.firstWhereOrNull((s)=> s.name == e.name && s.code == e.code) == null){
+          addStudent(name: e.name,academicYear: e.academicYear ?? 0,birthDate: e.birthDate,phone: e.phone ?? '');
+        }
+      }
+      getStudent();
     } catch (error) {
       GlobalFunction.errorPrint(error, 'download student');
     }

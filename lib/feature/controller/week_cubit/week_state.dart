@@ -28,9 +28,17 @@ class AttendActivityStudentLoading extends WeekState {}
 class AttendActivityStudentSuccess extends WeekState {}
 class AttendActivityStudentFailed extends WeekState {}
 
+class MissAbsentStudentLoading extends WeekState {}
+class MissAbsentStudentSuccess extends WeekState {}
+class MissAbsentStudentFailed extends WeekState {}
+
 class RemoveActivityStudentLoading extends WeekState {}
 class RemoveActivityStudentSuccess extends WeekState {}
 class RemoveActivityStudentFailed extends WeekState {}
+
+class RemoveMissAbsentStudentLoading extends WeekState {}
+class RemoveMissAbsentStudentSuccess extends WeekState {}
+class RemoveMissAbsentStudentFailed extends WeekState {}
 
 class IsStudentAttendLoading extends WeekState {}
 class IsStudentAttendSuccess extends WeekState {}

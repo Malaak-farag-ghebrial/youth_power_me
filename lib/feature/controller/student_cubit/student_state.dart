@@ -16,8 +16,9 @@ class AttendStudentFailed extends StudentState {}
 
 class FilterAbsentStudentLoading extends StudentState {}
 class FilterAbsentStudentSuccess extends StudentState {}
-class RemoveFilteredAbsentStudentSuccess extends StudentState {}
 
+class FilterBirthDateStudentLoading extends StudentState {}
+class FilterBirthDateStudentSuccess extends StudentState {}
 
 class RemoveAttendStudentLoading extends StudentState {}
 class RemoveAttendStudentSuccess extends StudentState {}

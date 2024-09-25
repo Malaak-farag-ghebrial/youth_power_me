@@ -58,5 +58,14 @@
   "left": "متبقى",
   "day": "يوم",
   "absent": "الغائبين",
-  "birth_date": "أعياد الميلاد"
+  "birth_date": "أعياد الميلاد",
+  "eftkad": "تم افتقاده",
+  "under_development": "تحت التطوير",
+  "not_eftkad": "لم يتم افتقاده",
+  "end_date": "اخر تاريخ",
+  "inBetween": "في خلال",
+  "show_birthdate": "إظهار اعياد الميلاد ",
+  "tomorrow": "غدا",
+  "today": "اليوم",
+  "yesterday": "أمس"
 }

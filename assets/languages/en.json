@@ -58,5 +58,14 @@
   "left": "Left",
   "day": "day",
   "absent": "The Absents",
-  "birth_date": "Birthdate"
+  "birth_date": "Birthdate",
+  "eftkad": "Missed",
+  "under_development": "Under Development",
+  "not_eftkad": "Not Missed yet!",
+  "end_date": "End Date",
+  "inBetween": "In Between",
+  "show_birthdate": "Show Birthdate",
+  "tomorrow": "Tomorrow",
+  "today": "Today",
+  "yesterday": "Yesterday"
 }

@@ -25,7 +25,11 @@ class AppString {
   static const String cancel = 'cancel';
   static String points = 'points';
   static String start_date = 'start_date';
+  static String show_birthdate = 'show_birthdate';
+  static String end_date = 'end_date';
   static String time = 'time';
+  static String eftkad = 'eftkad';
+  static String not_eftkad = 'not_eftkad';
   static String last_time = 'last_time';
   static String empty_field = 'empty_field';
   static String attendance = 'attendance';
@@ -35,6 +39,7 @@ class AppString {
   static String attend = 'attend';
   static String search = 'search';
   static String absent = 'absent';
+  static String inBetween = 'inBetween';
   static String exit_app = 'exit_app';
   static String not_found = 'not_found';
   static String sheetName = 'sheet_name';
@@ -48,6 +53,9 @@ class AppString {
   static String add_key_warning = 'add_key_warning';
   static String add_key_first = 'add_key_first';
   static String birth_date = 'birth_date';
+  static String today = 'today';
+  static String tomorrow = 'tomorrow';
+  static String yesterday = 'yesterday';
   static String academic_year_is_number = 'academic_year_is_number';
 
   static String empty_address = 'empty_address';

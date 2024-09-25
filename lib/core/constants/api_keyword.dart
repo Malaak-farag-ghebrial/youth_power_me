@@ -19,6 +19,7 @@ class ApiKey {
   static const String academicYear = 'academic_year';
   static const String activityId = 'activity_id';
   static const String activityIds = 'activity_ids';
+  static const String eftkad = 'eftkad';
   static const String attendance = 'attendance';
   static const String attendanceTable = 'attendance_table';
   static const String servantTable = 'servant_table';

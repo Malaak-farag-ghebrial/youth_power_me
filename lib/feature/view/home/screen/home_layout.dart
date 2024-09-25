@@ -8,8 +8,11 @@ import '../../../../core/component/my_warning_dialog.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/functions/global_variable.dart';
+import '../../../controller/activity_cubit/activity_cubit.dart';
 import '../../../controller/home_cubit/home_cubit.dart';
 import '../../../controller/setting_cubit/setting_cubit.dart';
+import '../../../controller/student_cubit/student_cubit.dart';
+import '../../../controller/week_cubit/week_cubit.dart';
 import '../widgets/nav_bar_widget.dart';
 
 class HomeLayout extends StatefulWidget {
@@ -35,9 +38,9 @@ class _HomeLayoutState extends State<HomeLayout> {
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
       var homeCubit = HomeCubit.get(context);
-      // var activityCubit = ActivityCubit.get(context);
-      // var studentCubit = StudentCubit.get(context);
-      // var weekCubit = WeekCubit.get(context);
+      var activityCubit = ActivityCubit.get(context);
+      var studentCubit = StudentCubit.get(context);
+      var weekCubit = WeekCubit.get(context);
       var settingCubit = SettingCubit.get(context);
       return PopScope(
         canPop: false,
@@ -56,16 +59,16 @@ class _HomeLayoutState extends State<HomeLayout> {
                           )
                         : const SizedBox(),
                     onTap: () async {
-                      // if (activityCubit.activityModel.isNotEmpty &&
-                      //     studentCubit.studentModel.isNotEmpty &&
-                      //     weekCubit.weekModel.isNotEmpty) {
-                      //   await SettingCubit.get(context).uploadBackup(
-                      //     activity: activityCubit.activityModel,
-                      //     student: studentCubit.studentModel,
-                      //     week: weekCubit.weekModel,
-                      //     key: settingCubit.keysModel,
-                      //   );
-                      // }
+                      if (activityCubit.activityModel.isNotEmpty &&
+                          studentCubit.studentModel.isNotEmpty &&
+                          weekCubit.weekModel.isNotEmpty) {
+                        await SettingCubit.get(context).uploadBackup(
+                          activity: activityCubit.activityModel,
+                          student: studentCubit.studentModel,
+                          week: weekCubit.weekModel,
+                          key: settingCubit.keysModel,
+                        );
+                      }
                       SystemNavigator.pop();
                     },
                     cancel: (){

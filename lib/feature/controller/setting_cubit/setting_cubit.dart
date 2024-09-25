@@ -58,6 +58,7 @@ class SettingCubit extends Cubit<SettingState> {
               available: e.available,
               repeated: e.repeated,
               attendance: e.attendance,
+              servantId: e.servantId,
             ).toJson())
             .toList()
       });
@@ -99,8 +100,9 @@ class SettingCubit extends Cubit<SettingState> {
             id: e.id,
             date: e.date,
             day: e.day,
-            activityID: e.activityID,
+            eftkad: e.eftkad,
             attendance: e.attendance,
+
           ).toJson();
         }).toList(),
       });
