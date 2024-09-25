@@ -27,10 +27,12 @@ class ActivityCubit extends Cubit<ActivityState> {
   Future<void> addActivity({
     required String name,
     int points = 0,
+    int? id,
     required bool available,
     required bool repeated,
     required List<Times> times,
     required List<Servant> servant,
+    bool fromDownload = false,
   }) async {
     emit(AddActivityLoading());
     if (database != null) {
@@ -39,6 +41,11 @@ class ActivityCubit extends Cubit<ActivityState> {
         batch.insert(
             ApiKey.activityTable,
             ActivityModel(
+                id: id,
+                code: DateTime.now()
+                    .millisecondsSinceEpoch
+                    .toString()
+                    .substring(7),
                 name: name,
                 times: times,
                 available: available,
@@ -46,7 +53,9 @@ class ActivityCubit extends Cubit<ActivityState> {
                 attendance: []).toJson());
         await batch.commit();
         emit(AddActivitySuccess());
-        getActivity();
+        if(!fromDownload){
+          getActivity();
+        }
       } on MyDatabaseException catch (error) {
         GlobalFunction.errorPrint(error, 'add activity');
         emit(AddActivityFailed());
@@ -64,7 +73,8 @@ class ActivityCubit extends Cubit<ActivityState> {
         final response = await database!.query(ApiKey.activityTable);
         activityModel = List<ActivityModel>.from(
             response.map((e) => ActivityModel.fromJson(e)));
-        GlobalFunction.print(activityModel.toString());
+        GlobalFunction.print(activityModel[0].code.toString());
+        GlobalFunction.print(activityModel[1].code.toString());
         emit(GetActivitySuccess());
       } on MyDatabaseException catch (error) {
         GlobalFunction.errorPrint(error, 'get activity');
@@ -79,6 +89,7 @@ class ActivityCubit extends Cubit<ActivityState> {
   Future<void> updateActivity({
     required int id,
     required String name,
+    required String code,
     int points = 0,
     required bool available,
     required bool repeated,
@@ -95,6 +106,7 @@ class ActivityCubit extends Cubit<ActivityState> {
           ActivityModel(
                   name: name,
                   times: times,
+                  code: code,
                   repeated: repeated,
                   available: available,
                   servantId: servants,
@@ -141,16 +153,27 @@ class ActivityCubit extends Cubit<ActivityState> {
 
   Future<void> downloadActivity() async {
     try {
+      Batch batch = database!.batch();
       final response = await _fireStore.collection(ApiKey.activityTable).get();
       List<ActivityModel> act = List<ActivityModel>.from(response.docs
           .map((e) => e.data()[ApiKey.activity])
           .toList()[0]
           .map((e) => ActivityModel.fromJson(e)));
+      GlobalFunction.print(act.toString());
       for (var e in act) {
-        if(act.firstWhereOrNull((a)=> a.name == e.name) == null){
-          addActivity(name: e.name, available: e.available, repeated: e.repeated, times: e.times, servant: []);
-        }
+        if(activityModel.firstWhereOrNull((a)=> a.code == e.code) == null){
+          batch.insert(
+              ApiKey.activityTable,
+              ActivityModel(
+                  id: e.id,
+                  name: e.name,
+                  code: e.code,
+                  times: e.times,
+                  available: e.available,
+                  repeated: e.repeated,
+                  attendance: e.attendance).toJson());        }
       }
+      await batch.commit();
       getActivity();
       GlobalFunction.print(activityModel.toString());
     } catch (error) {

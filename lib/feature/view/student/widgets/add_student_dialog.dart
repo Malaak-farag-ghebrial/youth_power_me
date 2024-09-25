@@ -105,7 +105,6 @@ class AddStudentDialog extends StatelessWidget {
                       name: nameController.text,
                       phone: phoneController.text,
                       academicYear: int.parse(academicController.text),
-                      id: student!.id,
                     );
                     pop(context);
                   } else {

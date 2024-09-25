@@ -133,8 +133,8 @@ class StudentModel extends Equatable {
         value: e.value,).toJson()).toList());
     data[ApiKey.phone] = phone;
     data[ApiKey.attendance] = jsonEncode(attendance.map((e) => Attendance(
-          studentId: e.studentId,
-          activityId: e.activityId,
+          studentCode: e.studentCode,
+          activityCode: e.activityCode,
           attend: e.attend,
           date: e.date,
           attendTime: e.attendTime,

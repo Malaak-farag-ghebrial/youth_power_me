@@ -161,8 +161,8 @@ class AttendanceStudentCard extends StatelessWidget {
                               .firstWhere((e) => e.id == weekModel.id)
                               .attendance
                               .firstWhereOrNull((e) =>
-                                  e.activityId == activityModel.id &&
-                                  e.studentId == studentModel.id) !=
+                                  e.activityCode == activityModel.code &&
+                                  e.studentCode == studentModel.code) !=
                           null
                       ? Padding(
                           padding: const EdgeInsets.only(top: 20),
@@ -170,11 +170,11 @@ class AttendanceStudentCard extends StatelessWidget {
                             onTap: () {
                               weekCubit.removeAttendActivityStudent(
                                   weekId: weekModel.id ?? 0,
-                                  actId: activityModel.id ?? 0,
-                                  stId: studentModel.id);
+                                  actCode: activityModel.code,
+                                  stCode: studentModel.code);
                               studentCubit.removeAttendStudent(
-                                  stId: studentModel.id,
-                                  actId: activityModel.id ?? 0);
+                                  stCode: studentModel.code,
+                                  actCode: activityModel.code);
                             },
                             child: Center(
                               child: Row(
@@ -191,8 +191,8 @@ class AttendanceStudentCard extends StatelessWidget {
                                         .firstWhere((e) => e.id == weekModel.id)
                                         .attendance
                                         .firstWhereOrNull((e) =>
-                                            e.activityId == activityModel.id &&
-                                            e.studentId == studentModel.id)!
+                                            e.activityCode == activityModel.code &&
+                                            e.studentCode == studentModel.code)!
                                         .attendTime,
                                     textDirection: ui.TextDirection.ltr,
                                   )
@@ -208,15 +208,15 @@ class AttendanceStudentCard extends StatelessWidget {
                             onTap: () {
                               weekCubit.attendActivityStudent(
                                 weekId: weekModel.id ?? 0,
-                                stId: studentModel.id,
-                                actId: activityModel.id ?? 0,
+                                stCode: studentModel.code,
+                                actCode: activityModel.code,
                                 attendTime: arabicToEnglish(DateFormat('h:mm a')
                                     .format(DateTime.now())
                                     .toString()),
                               );
                               studentCubit.attendStudent(
-                                stId: studentModel.id,
-                                actId: activityModel.id ?? 0,
+                                stCode: studentModel.code,
+                                actCode: activityModel.code,
                                 attendTime: arabicToEnglish(DateFormat('h:mm a')
                                     .format(DateTime.now())
                                     .toString()),

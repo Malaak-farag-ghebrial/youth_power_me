@@ -9,7 +9,7 @@ class WeekModel extends Equatable {
   final int? id;
   final String date;
   final String day;
-  final List<int> eftkad;
+  final List<String> eftkad;
   final List<Attendance> attendance;
 
   const WeekModel({
@@ -55,8 +55,8 @@ class WeekModel extends Equatable {
     data[ApiKey.eftkad] = jsonEncode(eftkad.map((e) => e).toList());
     data[ApiKey.attendance] = jsonEncode(attendance
         .map((e) => Attendance(
-              studentId: e.studentId,
-              activityId: e.activityId,
+              studentCode: e.studentCode,
+              activityCode: e.activityCode,
               attend: e.attend,
               date: e.date,
               attendTime: e.attendTime,
@@ -69,8 +69,8 @@ class WeekModel extends Equatable {
     final Map<String, dynamic> data = <String, dynamic>{};
     data[ApiKey.attendance] = jsonEncode(attendance
         .map((e) => Attendance(
-      studentId: e.studentId,
-      activityId: e.activityId,
+      studentCode: e.studentCode,
+      activityCode: e.activityCode,
       attend: e.attend,
       date: e.date,
       attendTime: e.attendTime,
@@ -85,7 +85,7 @@ class WeekModel extends Equatable {
       id: json[ApiKey.id],
       date: json[ApiKey.date],
       day: json[ApiKey.day],
-      eftkad: List<int>.from(jsonDecode(json[ApiKey.eftkad]).map((e) => e)),
+      eftkad: List<String>.from(jsonDecode(json[ApiKey.eftkad]).map((e) => e)),
       attendance: List<Attendance>.from(
           jsonDecode(json[ApiKey.attendance]).map((e) => Attendance.fromJson(e))),
     );

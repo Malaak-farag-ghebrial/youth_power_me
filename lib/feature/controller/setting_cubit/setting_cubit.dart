@@ -54,6 +54,7 @@ class SettingCubit extends Cubit<SettingState> {
               id: e.id,
               name: e.name,
               points: e.points,
+              code: e.code,
               times: e.times,
               available: e.available,
               repeated: e.repeated,

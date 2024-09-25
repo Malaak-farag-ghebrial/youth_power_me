@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:youth_power/core/component/my_indicator.dart';
 import '../../../../core/component/my_button.dart';
 import '../../../../core/component/my_input_field.dart';
 import '../../../../core/component/my_navigator.dart';
@@ -76,28 +77,30 @@ final searchController = TextEditingController();
                   navigateTo(context, NearestBirthDateStudent());
                 },
               ),
-              ListView.builder(
-                  itemCount: studentCubit.searchStudentModel.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: (){
-                        navigateTo(context, StudentDetail(studentModel: studentCubit.searchStudentModel[index],));
-                      },
-                      child: StudentCard(
-                        student: studentCubit.searchStudentModel[index],
-                        onDeletePressed: (){
-                          studentCubit.deleteStudent(id: studentCubit.searchStudentModel[index].id ?? 0);
+             state is GetStudentLoading ? const MyIndicator() : Expanded(
+               child: ListView.builder(
+                    itemCount: studentCubit.searchStudentModel.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: (){
+                          navigateTo(context, StudentDetail(studentModel: studentCubit.searchStudentModel[index],));
                         },
-                        onEditPressed: ()async{
-                          await showDialog(context: context,
-                              builder: (context){
-                                return AddStudentDialog(edit: true,student: studentCubit.searchStudentModel[index],);
-                              },);
-                        },
-                      ),
-                    );
-                  }),
+                        child: StudentCard(
+                          student: studentCubit.searchStudentModel[index],
+                          onDeletePressed: (){
+                            studentCubit.deleteStudent(id: studentCubit.searchStudentModel[index].id ?? 0);
+                          },
+                          onEditPressed: ()async{
+                            await showDialog(context: context,
+                                builder: (context){
+                                  return AddStudentDialog(edit: true,student: studentCubit.searchStudentModel[index],);
+                                },);
+                          },
+                        ),
+                      );
+                    }),
+             ),
             ],
           ),
         );

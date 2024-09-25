@@ -17,7 +17,7 @@ class AppConstant {
 
 
  /// DEFs
- static const String appTitle = 'Logix User';
+ static const String appTitle = 'اجتماع الملاك ميخائيل';
  static const String fontFamily = 'NotoKufiArabic';
  static const String tag = 'logoTag';
  static const String initialCountry = 'EG';

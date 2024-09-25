@@ -49,14 +49,14 @@ class AbsentStudentCallCard extends StatelessWidget {
                   weekCubit.weekModel
                               .firstWhere((e) => e.id == week.id)
                               .eftkad
-                              .firstWhereOrNull((e) => e == student.id) !=
+                              .firstWhereOrNull((e) => e == student.code) !=
                           null
                       ? Padding(
                           padding: const EdgeInsets.only(top: 20),
                           child: InkWell(
                             onTap: () {
                               weekCubit.removeMissAbsentStudent(
-                                  weekId: week.id ?? 0, studentId: student.id);
+                                  weekId: week.id ?? 0, studentCode: student.code);
                             },
                             child:  Center(
                               child: Row(
@@ -78,7 +78,7 @@ class AbsentStudentCallCard extends StatelessWidget {
                           child: InkWell(
                             onTap: () {
                               weekCubit.missAbsentStudent(
-                                  weekId: week.id ?? 0, studentId: student.id);
+                                  weekId: week.id ?? 0, studentCode: student.code);
                             },
                             child: Container(
                               height: 30,

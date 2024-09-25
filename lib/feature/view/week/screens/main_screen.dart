@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:youth_power/feature/controller/activity_cubit/activity_cubit.dart';
+import 'package:youth_power/feature/controller/student_cubit/student_cubit.dart';
 import '../../../../core/component/my_indicator.dart';
 import '../../../../core/component/my_navigator.dart';
 import '../../../../core/component/my_text.dart';
@@ -15,7 +17,15 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<WeekCubit,WeekState>(
+    return BlocConsumer<WeekCubit,WeekState>(
+      listener: (context,state){
+        if(state is GetWeekSuccess && StudentCubit.get(context).studentModel.isEmpty){
+          StudentCubit.get(context).getStudent();
+        }
+        if(state is GetWeekSuccess && ActivityCubit.get(context).activityModel.isEmpty){
+          ActivityCubit.get(context).getActivity();
+        }
+      },
       builder: (context,state) {
         var weekCubit = WeekCubit.get(context);
         return Scaffold(

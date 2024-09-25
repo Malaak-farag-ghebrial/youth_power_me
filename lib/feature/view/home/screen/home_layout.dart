@@ -38,10 +38,10 @@ class _HomeLayoutState extends State<HomeLayout> {
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
       var homeCubit = HomeCubit.get(context);
-      var activityCubit = ActivityCubit.get(context);
-      var studentCubit = StudentCubit.get(context);
       var weekCubit = WeekCubit.get(context);
       var settingCubit = SettingCubit.get(context);
+      var activityCubit = ActivityCubit.get(context);
+      var studentCubit = StudentCubit.get(context);
       return PopScope(
         canPop: false,
         onPopInvokedWithResult: (v,d) async {

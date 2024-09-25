@@ -31,16 +31,17 @@ class ExcelService {
 
       int index = 0;
       final Map<String, dynamic> json = {};
-     // GlobalFunction.print(excel.tables[sheets[0]]?.rows.first.toString() ?? '',name: 'jjjjj');
+      // GlobalFunction.print(excel.tables[sheets[0]]?.rows.first.toString() ?? '',name: 'jjjjj');
       for (final String sheet in sheets) {
         List<Data?> keys = [];
         json.addAll({sheet: []});
         //GlobalFunction.print(excel.tables[sheet]?.rows[3][1]?.value.toString()?? '' , name: 'tryyyy');
-        for (final List<Data?> col in excel.tables[sheet]?.rows.skip(firstRowNum) ?? []) {
+        for (final List<Data?> col
+            in excel.tables[sheet]?.rows.skip(firstRowNum) ?? []) {
           try {
             if (index == 0) {
               keys = col;
-             // GlobalFunction.print(keys[1]?.value.toString() ?? '',name: 'hiiiii');
+              // GlobalFunction.print(keys[1]?.value.toString() ?? '',name: 'hiiiii');
               index++;
             }
             /*else {*/
@@ -78,12 +79,12 @@ class ExcelService {
           ))).toString());*/
       return List<StudentModel>.from(
           json[sheetKey].skip(1).map((e) => StudentModel.fromExcel(
-            json: e,
-            name: nameKey,
-            acdY: acdYKey,
-            num: numKey,
-            phone: phoneKey,
-            birthDate: birthDate,
+                json: e,
+                name: nameKey,
+                acdY: acdYKey,
+                num: numKey,
+                phone: phoneKey,
+                birthDate: birthDate,
               )));
 
       //   StudentModel.fromExcel(
@@ -104,7 +105,7 @@ class ExcelService {
     required List<StudentModel> student,
     required String sheetName,
     required BuildContext context,
-}){
+  }) {
     var excel = Excel.createExcel();
     Sheet sheet = excel[sheetName];
     excel.setDefaultSheet(sheetName);
@@ -121,9 +122,9 @@ class ExcelService {
       bold: true,
       horizontalAlign: HorizontalAlign.Center,
       verticalAlign: VerticalAlign.Center,
-      backgroundColorHex: ExcelColor.green,//'#1AFF1A',
+      backgroundColorHex: ExcelColor.green,
+      //'#1AFF1A',
       rotation: 90,
-
     );
     CellStyle style2 = CellStyle(
       fontSize: 16,
@@ -132,62 +133,79 @@ class ExcelService {
       verticalAlign: VerticalAlign.Center,
     );
 
-    var cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: 0,columnIndex: 0));
-    cell.value =  TextCellValue('Week ');
+    var cell =
+        sheet.cell(CellIndex.indexByColumnRow(rowIndex: 0, columnIndex: 0));
+    cell.value = TextCellValue('Week ');
     cell.cellStyle = style1.copyWith(rotationVal: 0);
-    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: 0,columnIndex: 1));
+    cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: 0, columnIndex: 1));
     cell.value = TextCellValue(week.date);
     cell.cellStyle = style1.copyWith(rotationVal: 0);
 
-    for(int col = 0;col < header.length + activity.length;col++){
-      var cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: 1,columnIndex: col));
-      cell.value = col < header.length ? TextCellValue(header[col]) : TextCellValue(activity[col - header.length].name);
+    for (int col = 0; col < header.length + activity.length; col++) {
+      var cell =
+          sheet.cell(CellIndex.indexByColumnRow(rowIndex: 1, columnIndex: col));
+      cell.value = col < header.length
+          ? TextCellValue(header[col])
+          : TextCellValue(activity[col - header.length].name);
       sheet.setColumnAutoFit(col);
-      if(col == 0 || col == 1){
+      if (col == 0 || col == 1) {
         cell.cellStyle = style1.copyWith(rotationVal: 0);
-      }else{
+      } else {
         cell.cellStyle = style1;
       }
     }
-    for(int col = 0;col < header.length + activity.length;col++){
+    for (int col = 0; col < header.length + activity.length; col++) {
       sheet.setColumnAutoFit(col);
-      for(int row = 2;row <= student.length +1;row++){
-        var cell = sheet.cell(CellIndex.indexByColumnRow(rowIndex: row,columnIndex: col));
-        if(col == 0) {
+      for (int row = 2; row <= student.length + 1; row++) {
+        var cell = sheet
+            .cell(CellIndex.indexByColumnRow(rowIndex: row, columnIndex: col));
+        if (col == 0) {
           cell.value = TextCellValue(student[row - 2].name);
-          sheet.setColumnWidth(col,40);
+          sheet.setColumnWidth(col, 40);
           cell.cellStyle = style2.copyWith(boldVal: true);
-        }else if(col == 1){
+        } else if (col == 1) {
           cell.value = TextCellValue(student[row - 2].phone ?? '');
-          sheet.setColumnWidth(col,30);
-          cell.cellStyle = style2.copyWith(horizontalAlignVal: HorizontalAlign.Center);
-        }  else if(col == 2){
+          sheet.setColumnWidth(col, 30);
+          cell.cellStyle =
+              style2.copyWith(horizontalAlignVal: HorizontalAlign.Center);
+        } else if (col == 2) {
           cell.value = TextCellValue(student[row - 2].academicYear.toString());
-          cell.cellStyle = style2.copyWith(horizontalAlignVal: HorizontalAlign.Center);
-        }else if(col == 3){
+          cell.cellStyle =
+              style2.copyWith(horizontalAlignVal: HorizontalAlign.Center);
+        } else if (col == 3) {
           // cell.value = TextCellValue(StudentCubit.get(context).studentPoints(student[row - 2].points).toString());
           // cell.cellStyle = style2.copyWith(horizontalAlignVal: HorizontalAlign.Center,boldVal: true,fontSizeVal: 20);
-        }else {
-          cell.value = TextCellValue(week.attendance.firstWhereOrNull((e)=> e.activityId == activity[col - header.length].id && e.studentId == student[row - 2].id) != null ? '1' : '0') ;
-          cell.cellStyle = style2.copyWith(horizontalAlignVal: HorizontalAlign.Center);
+        } else {
+          cell.value = TextCellValue(week.attendance.firstWhereOrNull((e) =>
+                      e.activityCode == activity[col - header.length].code &&
+                      e.studentCode == student[row - 2].code) !=
+                  null
+              ? '1'
+              : '0');
+          cell.cellStyle =
+              style2.copyWith(horizontalAlignVal: HorizontalAlign.Center);
         }
       }
     }
     return excel;
   }
 
-  Map<String, dynamic> _getRows(final List<Data?> keys, final List<Data?> column) {
+  Map<String, dynamic> _getRows(
+      final List<Data?> keys, final List<Data?> column) {
     final Map<String, dynamic> temp = {};
     int index = 0;
     String tk = '';
-   // GlobalFunction.print(column[1]?.value.toString() ?? '',name: 'taa');
+    // GlobalFunction.print(column[1]?.value.toString() ?? '',name: 'taa');
     for (final Data? key in keys) {
-      if (key != null && key.value != null && key.value.toString() != 'null' && key.value.toString() != '') {
+      if (key != null &&
+          key.value != null &&
+          key.value.toString() != 'null' &&
+          key.value.toString() != '') {
         tk = key.value.toString().replaceAll('\n', ' ');
-        if(index > 3){
+        if (index > 3) {
           break;
         }
-       // GlobalFunction.print(key.value.toString().replaceAll('\n', ' '),name: 'tk');
+        // GlobalFunction.print(key.value.toString().replaceAll('\n', ' '),name: 'tk');
 
         if (column[index] is String ||
             column[index] is int ||
@@ -199,12 +217,11 @@ class ExcelService {
             temp[tk] = false;
           } else {
             temp[tk] = column[index]?.value.toString().replaceAll('\n', '');
-         //  GlobalFunction.print(column[index]?.value.toString().replaceAll('\n', '') ?? '',name: 'Row1');
+            //  GlobalFunction.print(column[index]?.value.toString().replaceAll('\n', '') ?? '',name: 'Row1');
           }
         } else {
-
           temp[tk] = column[index]?.value.toString().replaceAll('\n', '');
-         // GlobalFunction.print(row[index]?.value.toString().replaceAll('\n', '') ?? '',name: 'Row2');
+          // GlobalFunction.print(row[index]?.value.toString().replaceAll('\n', '') ?? '',name: 'Row2');
         }
 
         index++;

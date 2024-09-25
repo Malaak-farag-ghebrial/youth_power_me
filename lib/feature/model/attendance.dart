@@ -4,15 +4,15 @@ import 'package:equatable/equatable.dart';
 import '../../core/constants/api_keyword.dart';
 
 class Attendance extends Equatable {
-  final int studentId;
-  final int activityId;
+  final String studentCode;
+  final String activityCode;
   final bool attend;
   final String date;
   final String attendTime;
 
   const Attendance({
-    required this.studentId,
-    required this.activityId,
+    required this.studentCode,
+    required this.activityCode,
     required this.attend,
     required this.date,
     required this.attendTime,
@@ -20,8 +20,8 @@ class Attendance extends Equatable {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data[ApiKey.studentId] = studentId;
-    data[ApiKey.activityId] = activityId;
+    data[ApiKey.studentId] = studentCode;
+    data[ApiKey.activityId] = activityCode;
     data[ApiKey.attend] = attend;
     data[ApiKey.date] = date;
     data[ApiKey.attendTime] = attendTime;
@@ -30,8 +30,8 @@ class Attendance extends Equatable {
 
   factory Attendance.fromJson(Map<String, dynamic> json) {
     return Attendance(
-      studentId: json[ApiKey.studentId],
-      activityId: json[ApiKey.activityId],
+      studentCode: json[ApiKey.studentId],
+      activityCode: json[ApiKey.activityId],
       attend: json[ApiKey.attend],
       date: json[ApiKey.date],
       attendTime: json[ApiKey.attendTime],

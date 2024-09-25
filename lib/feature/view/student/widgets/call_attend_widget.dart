@@ -48,8 +48,8 @@ class AttendCaller extends StatelessWidget {
                                       .first
                                       .attendance
                                       .firstWhereOrNull((element) =>
-                                          element.studentId ==
-                                          studentModel.id) !=
+                                          element.studentCode ==
+                                          studentModel.code) !=
                                   null
                               ? const Icon(
                                   AppIcons.check,

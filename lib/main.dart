@@ -3,16 +3,17 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:youth_power/feature/controller/activity_cubit/activity_cubit.dart';
-import 'package:youth_power/feature/controller/home_cubit/home_cubit.dart';
-import 'package:youth_power/feature/controller/setting_cubit/setting_cubit.dart';
-import 'package:youth_power/feature/controller/student_cubit/student_cubit.dart';
-import 'package:youth_power/feature/controller/week_cubit/week_cubit.dart';
 
+import 'core/constants/app_constant.dart';
 import 'core/constants/lists.dart';
 import 'core/functions/global_variable.dart';
 import 'core/services/bloc_observer.dart';
 import 'core/theme/light.dart';
+import 'feature/controller/activity_cubit/activity_cubit.dart';
+import 'feature/controller/home_cubit/home_cubit.dart';
+import 'feature/controller/setting_cubit/setting_cubit.dart';
+import 'feature/controller/student_cubit/student_cubit.dart';
+import 'feature/controller/week_cubit/week_cubit.dart';
 import 'feature/view/home/screen/home_layout.dart';
 import 'firebase_options.dart';
 
@@ -56,7 +57,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context)=> SettingCubit()),
       ],
       child: MaterialApp(
-            title: 'YOUTH Power',
+            title: AppConstant.appTitle,
             debugShowCheckedModeBanner: false,
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,

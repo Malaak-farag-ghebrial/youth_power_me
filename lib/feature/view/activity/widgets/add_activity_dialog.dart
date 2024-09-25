@@ -323,9 +323,11 @@ class AddActivityDialog extends StatelessWidget {
                 repeated: activityCubit.repeated,
                 points: int.tryParse(pointController.text) ?? 0,
                 servants: [],
+                code: activityModel!.code,
+                attendance: activityModel!.attendance ?? [],
                 times: List.from(
                   times.map(
-                    (e) => Times(
+                        (e) => Times(
                       time: arabicToEnglish(e.time),
                       lastTimeAttend: arabicToEnglish(e.lastTimeAttend),
                       day: e.day,

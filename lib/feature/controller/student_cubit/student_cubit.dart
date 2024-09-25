@@ -35,6 +35,8 @@ class StudentCubit extends Cubit<StudentState> {
     required String phone,
     required String birthDate,
     required int academicYear,
+    String? code,
+    bool fromDownload = false,
   }) async {
     emit(AddStudentLoading());
     if (database != null) {
@@ -44,7 +46,7 @@ class StudentCubit extends Cubit<StudentState> {
             ApiKey.studentTable,
             StudentModel(
                     id: 0,
-                    code: DateTime.now()
+                    code: code?? DateTime.now()
                         .millisecondsSinceEpoch
                         .toString()
                         .substring(7),
@@ -58,7 +60,9 @@ class StudentCubit extends Cubit<StudentState> {
                 .toJson());
         await batch.commit();
         emit(AddStudentSuccess());
-        getStudent();
+        if(!fromDownload){
+          getStudent();
+        }
       } on MyDatabaseException catch (error) {
         GlobalFunction.errorPrint(error, '');
         emit(AddPointStudentFailed());
@@ -92,7 +96,6 @@ class StudentCubit extends Cubit<StudentState> {
   }
 
   Future<void> updateStudent({
-    required int id,
     required String code,
     required String name,
     required String phone,
@@ -119,8 +122,8 @@ class StudentCubit extends Cubit<StudentState> {
               activityIDs: activityId,
               points: points,
             ).toJson(),
-            where: '${ApiKey.id}=?',
-            whereArgs: [id]);
+            where: '${ApiKey.code}=?',
+            whereArgs: [code]);
         await batch.commit();
         emit(EditStudentSuccess());
         getStudent();
@@ -172,39 +175,38 @@ class StudentCubit extends Cubit<StudentState> {
   }
 
   Future<void> attendStudent({
-    required int stId,
-    required int actId,
+    required String stCode,
+    required String actCode,
     required String attendTime,
   }) async {
     emit(AttendStudentLoading());
     try {
-      StudentModel student = studentModel.firstWhere((e) => e.id == stId);
+      StudentModel student = studentModel.firstWhere((e) => e.code == stCode);
       student.attendance.add(Attendance(
-        studentId: stId,
-        activityId: actId,
+        studentCode: stCode,
+        activityCode: actCode,
         attend: true,
         date: dateFormat(DateTime.now()),
         attendTime: attendTime,
       ));
-      studentModel.firstWhere((e) => e.id == stId).attendance.add(Attendance(
-            studentId: stId,
-            activityId: actId,
+      studentModel.firstWhere((e) => e.code == stCode).attendance.add(Attendance(
+        studentCode: stCode,
+        activityCode: actCode,
             attend: true,
             date: dateFormat(DateTime.now()),
             attendTime: attendTime,
           ));
       searchStudentModel
-          .firstWhere((e) => e.id == stId)
+          .firstWhere((e) => e.code == stCode)
           .attendance
           .add(Attendance(
-            studentId: stId,
-            activityId: actId,
+        studentCode: stCode,
+        activityCode: actCode,
             attend: true,
             date: dateFormat(DateTime.now()),
             attendTime: attendTime,
           ));
       updateStudent(
-        id: stId,
         code: student.code,
         name: student.name,
         phone: student.phone ?? '',
@@ -227,7 +229,7 @@ class StudentCubit extends Cubit<StudentState> {
     absentStudentModel = studentModel
         .where((s) => !week.attendance.contains(week.attendance
             .firstWhereOrNull(
-                (a) => a.studentId == s.id && a.activityId == activity.id)))
+                (a) => a.studentCode == s.code && a.activityCode == activity.code)))
         .toList();
     GlobalFunction.print(absentStudentModel.toString());
     emit(FilterAbsentStudentSuccess());
@@ -268,24 +270,23 @@ class StudentCubit extends Cubit<StudentState> {
   }
 
   Future<void> removeAttendStudent({
-    required int stId,
-    required int actId,
+    required String stCode,
+    required String actCode,
   }) async {
     emit(RemoveAttendStudentLoading());
     try {
-      StudentModel student = studentModel.firstWhere((e) => e.id == stId);
+      StudentModel student = studentModel.firstWhere((e) => e.code == stCode);
       student.attendance
-          .removeWhere((e) => e.studentId == stId && e.activityId == actId);
+          .removeWhere((e) => e.studentCode == stCode && e.activityCode == actCode);
       studentModel
-          .firstWhere((e) => e.id == stId)
+          .firstWhere((e) => e.code == stCode)
           .attendance
-          .removeWhere((e) => e.studentId == stId && e.activityId == actId);
+          .removeWhere((e) => e.studentCode == stCode && e.activityCode == actCode);
       searchStudentModel
-          .firstWhere((e) => e.id == stId)
+          .firstWhere((e) => e.code == stCode)
           .attendance
-          .removeWhere((e) => e.studentId == stId && e.activityId == actId);
+          .removeWhere((e) => e.studentCode == stCode && e.activityCode == actCode);
       updateStudent(
-        id: stId,
         code: student.code,
         name: student.name,
         phone: student.phone ?? '',
@@ -312,16 +313,29 @@ class StudentCubit extends Cubit<StudentState> {
 
   Future<void> downloadStudent() async {
     try {
+      Batch batch = database!.batch();
       final response = await _fireStore.collection(ApiKey.studentTable).get();
       List<StudentModel> st = List<StudentModel>.from(response.docs
           .map((e) => e.data()[ApiKey.student])
           .toList()[0]
           .map((e) => StudentModel.fromJson(e)));
       for (var e in st) {
-        if(st.firstWhereOrNull((s)=> s.name == e.name && s.code == e.code) == null){
-          addStudent(name: e.name,academicYear: e.academicYear ?? 0,birthDate: e.birthDate,phone: e.phone ?? '');
-        }
+        if(studentModel.firstWhereOrNull((s)=> s.name == e.name && s.code == e.code) == null){
+          batch.insert(
+              ApiKey.studentTable,
+              StudentModel(
+                  id: e.id,
+                  code: e.code,
+                  name: e.name,
+                  points: e.points,
+                  phone: e.phone,
+                  activityIDs: e.activityIDs,
+                  attendance: e.attendance,
+                  academicYear: e.academicYear,
+                  birthDate: e.birthDate)
+                  .toJson());        }
       }
+      await batch.commit();
       getStudent();
     } catch (error) {
       GlobalFunction.errorPrint(error, 'download student');

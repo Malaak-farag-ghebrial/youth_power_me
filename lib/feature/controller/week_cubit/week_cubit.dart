@@ -30,6 +30,7 @@ class WeekCubit extends Cubit<WeekState> {
   final _fireStore = FirebaseFirestore.instance;
   List<WeekModel> weekModel = [];
 
+
   Future<void> createDatabase() async {
     final response = await openDatabase(ApiKey.databasePath, version: 1,
         onCreate: (Database data, int version) async {
@@ -40,6 +41,7 @@ class WeekCubit extends Cubit<WeekState> {
         (
         ${ApiKey.id} INTEGER PRIMARY KEY,
         ${ApiKey.name} TEXT,
+        ${ApiKey.code} TEXT,
         ${ApiKey.servantId} TEXT,
         ${ApiKey.points} INTEGER,
         ${ApiKey.times} TEXT,
@@ -126,8 +128,10 @@ class WeekCubit extends Cubit<WeekState> {
     }
   }
 
+
   Future<void> addWeek({
     required DateTime dateTime,
+    bool fromDownload = false,
   }) async {
     emit(AddWeekLoading());
     if (database != null) {
@@ -144,7 +148,9 @@ class WeekCubit extends Cubit<WeekState> {
                 attendance: []).toJson());
         await batch.commit();
         emit(AddWeekSuccess());
-        getWeek();
+        if (!fromDownload) {
+          getWeek();
+        }
       } on MyDatabaseException catch (error) {
         GlobalFunction.errorPrint(error, 'add week');
         emit(AddWeekFailed());
@@ -234,23 +240,23 @@ class WeekCubit extends Cubit<WeekState> {
 
   Future<void> attendActivityStudent({
     required int weekId,
-    required int actId,
-    required int stId,
+    required String actCode,
+    required String stCode,
     required String attendTime,
   }) async {
     emit(AttendActivityStudentLoading());
     try {
       WeekModel week = weekModel.firstWhere((e) => e.id == weekId);
       week.attendance.add(Attendance(
-        studentId: stId,
-        activityId: actId,
+        studentCode: stCode,
+        activityCode: actCode,
         attend: true,
         date: dateFormat(DateTime.now()),
         attendTime: attendTime,
       ));
       weekModel.firstWhere((e) => e.id == weekId).attendance.add(Attendance(
-            studentId: stId,
-            activityId: actId,
+            studentCode: stCode,
+            activityCode: actCode,
             attend: true,
             date: dateFormat(DateTime.now()),
             attendTime: attendTime,
@@ -264,12 +270,12 @@ class WeekCubit extends Cubit<WeekState> {
   }
 
   Future<void> missAbsentStudent(
-      {required int weekId, required int studentId}) async {
+      {required int weekId, required String studentCode}) async {
     emit(MissAbsentStudentLoading());
     try {
       WeekModel week = weekModel.firstWhere((e) => e.id == weekId);
-      week.eftkad.add(studentId);
-      weekModel.firstWhere((e) => e.id == weekId).eftkad.add(studentId);
+      week.eftkad.add(studentCode);
+      weekModel.firstWhere((e) => e.id == weekId).eftkad.add(studentCode);
       updateWeek(week: week);
       emit(MissAbsentStudentSuccess());
     } catch (error) {
@@ -280,18 +286,16 @@ class WeekCubit extends Cubit<WeekState> {
 
   Future<void> removeAttendActivityStudent({
     required int weekId,
-    required int actId,
-    required int stId,
+    required String actCode,
+    required String stCode,
   }) async {
     emit(RemoveActivityStudentLoading());
     try {
       WeekModel week = weekModel.firstWhere((e) => e.id == weekId);
-      week.attendance
-          .removeWhere((e) => e.studentId == stId && e.activityId == actId);
-      weekModel
-          .firstWhere((e) => e.id == weekId)
-          .attendance
-          .removeWhere((e) => e.studentId == stId && e.activityId == actId);
+      week.attendance.removeWhere(
+          (e) => e.studentCode == stCode && e.activityCode == actCode);
+      weekModel.firstWhere((e) => e.id == weekId).attendance.removeWhere(
+          (e) => e.studentCode == stCode && e.activityCode == actCode);
       updateWeek(week: week);
       emit(RemoveActivityStudentSuccess());
     } catch (error) {
@@ -302,16 +306,16 @@ class WeekCubit extends Cubit<WeekState> {
 
   Future<void> removeMissAbsentStudent({
     required int weekId,
-    required int studentId,
+    required String studentCode,
   }) async {
     emit(RemoveMissAbsentStudentLoading());
     try {
       WeekModel week = weekModel.firstWhere((e) => e.id == weekId);
-      week.eftkad.removeWhere((e) => e == studentId);
+      week.eftkad.removeWhere((e) => e == studentCode);
       weekModel
           .firstWhere((e) => e.id == weekId)
           .eftkad
-          .removeWhere((e) => e == studentId);
+          .removeWhere((e) => e == studentCode);
       updateWeek(week: week);
       emit(RemoveMissAbsentStudentSuccess());
     } catch (error) {
@@ -322,16 +326,33 @@ class WeekCubit extends Cubit<WeekState> {
 
   Future<void> downloadWeek() async {
     try {
+      Batch batch = database!.batch();
       final response = await _fireStore.collection(ApiKey.weekTable).get();
       List<WeekModel> week = List<WeekModel>.from(response.docs
           .map((e) => e.data()[ApiKey.week])
           .toList()[0]
           .map((e) => WeekModel.fromJson(e))).toList();
+      GlobalFunction.print(week[1].attendance[0].studentCode.toString(),
+          name: 'check attendance');
+      GlobalFunction.print(week[1].attendance[1].studentCode.toString(),
+          name: 'check attendance');
       for (var e in week) {
-        if(week.firstWhereOrNull((w)=> w.date == e.date) == null) {
-          addWeek(dateTime: DateTime.parse(e.date));
+        if (weekModel.firstWhereOrNull((w) => w.date == e.date) == null) {
+          batch.insert(
+              ApiKey.weekTable,
+              WeekModel(
+                  date: dateFormat(
+                      DateTime.parse(arabicToEnglish(DateTime.parse(e.date).toString()))),
+                  day: DateFormat('EEEE').format(
+                      DateTime.parse(arabicToEnglish(DateTime.parse(e.date).toString()))),
+                  eftkad: e.eftkad,
+                  attendance: e.attendance).toJson());
         }
       }
+      await batch.commit();
+      getWeek();
+      GlobalFunction.print(weekModel[0].attendance.toString(),
+          name: 'teeeeeeeest');
     } catch (error) {
       GlobalFunction.errorPrint(error, 'download week');
     }
