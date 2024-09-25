@@ -47,7 +47,7 @@ class ActivityScreen extends StatelessWidget {
                 return ActivityCard(
                   activity: activityCubit.activityModel[index],
                   onDeletePressed: () {
-                    activityCubit.deleteActivity(id: activityCubit.activityModel[index].id ?? 0);
+                    activityCubit.deleteActivity(code: activityCubit.activityModel[index].code);
                   },
                   onEditPressed: () async {
                     await showDialog(

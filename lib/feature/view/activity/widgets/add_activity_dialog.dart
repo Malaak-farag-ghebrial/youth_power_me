@@ -175,7 +175,6 @@ class AddActivityDialog extends StatelessWidget {
                                             .toString(),
                                         date: dateFormat(value),
                                       );
-                                      GlobalFunction.print(times.toString());
                                     } else {
                                       startDateController[index].text = '';
                                     }
@@ -208,11 +207,6 @@ class AddActivityDialog extends StatelessWidget {
                                                       .text)),
                                           date:
                                               startDateController[index].text);
-                                      GlobalFunction.print(
-                                          value.format(context).toString());
-                                      GlobalFunction.print(times.toString());
-                                      GlobalFunction.print(
-                                          value.format(context).toString());
                                     } else {
                                       timeController[index].text = '';
                                     }
@@ -244,9 +238,6 @@ class AddActivityDialog extends StatelessWidget {
                                                       .text)),
                                           date:
                                               startDateController[index].text);
-                                      GlobalFunction.print(
-                                          value.format(context).toString());
-                                      GlobalFunction.print(times.toString());
                                     } else {
                                       lastTimeController[index].text = '';
                                     }

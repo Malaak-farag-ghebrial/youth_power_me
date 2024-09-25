@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/component/my_text.dart';
+import '../../../../core/component/my_toast.dart';
 import '../../../../core/component/shadow_box.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_icons.dart';
@@ -21,7 +22,11 @@ class AttendCaller extends StatelessWidget {
       var studentCubit = StudentCubit.get(context);
       return InkWell(
         onTap: () {
-          studentCubit.callPhone(studentModel.phone ?? '');
+          if(studentModel.phone !=  null && studentModel.phone != ''){
+            studentCubit.callPhone(studentModel.phone ?? '');
+          }else{
+            MyToast(msg: AppString.phone_not_found, state: ToastStates.WARNING);
+          }
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -65,8 +70,20 @@ class AttendCaller extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(studentModel.phone ?? AppString.not_found,
-                            style: Theme.of(context).textTheme.titleMedium),
+                        child:     (studentModel.phone != null &&
+                            studentModel.phone != '')
+                            ? Text(
+                          studentModel.phone ?? '',
+                          style:
+                          Theme.of(context).textTheme.titleMedium,
+                        )
+                            : MyText(
+                          AppString.phone_not_found,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(color: AppColors.red),
+                        ),
                       ),
                       const Icon(AppIcons.arrow),
                     ],

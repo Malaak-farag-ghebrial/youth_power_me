@@ -172,8 +172,6 @@ class WeekCubit extends Cubit<WeekState> {
           return DateTime.parse('${b.date} 00:00:00')
               .compareTo(DateTime.parse('${a.date} 00:00:00'));
         });
-        GlobalFunction.print(response.toString(), name: 'weeek get');
-        //  GlobalFunction.print(weekModel[0].attendance.toString(),name: 'weeek get');
         emit(GetWeekSuccess());
       } on MyDatabaseException catch (error) {
         GlobalFunction.errorPrint(error, 'get week');
@@ -192,7 +190,6 @@ class WeekCubit extends Cubit<WeekState> {
     if (database != null) {
       Batch batch = database!.batch();
       try {
-        GlobalFunction.print(week.attendance.toString(), name: 'update 1');
         batch.update(
           ApiKey.weekTable,
           WeekModel(
@@ -332,10 +329,6 @@ class WeekCubit extends Cubit<WeekState> {
           .map((e) => e.data()[ApiKey.week])
           .toList()[0]
           .map((e) => WeekModel.fromJson(e))).toList();
-      GlobalFunction.print(week[1].attendance[0].studentCode.toString(),
-          name: 'check attendance');
-      GlobalFunction.print(week[1].attendance[1].studentCode.toString(),
-          name: 'check attendance');
       for (var e in week) {
         if (weekModel.firstWhereOrNull((w) => w.date == e.date) == null) {
           batch.insert(
@@ -351,8 +344,6 @@ class WeekCubit extends Cubit<WeekState> {
       }
       await batch.commit();
       getWeek();
-      GlobalFunction.print(weekModel[0].attendance.toString(),
-          name: 'teeeeeeeest');
     } catch (error) {
       GlobalFunction.errorPrint(error, 'download week');
     }

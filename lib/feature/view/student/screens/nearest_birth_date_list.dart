@@ -1,10 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:youth_power/core/component/my_toast.dart';
 
 import '../../../../../core/constants/app_strings.dart';
 import '../../../../core/component/my_input_field.dart';
 import '../../../../core/component/my_text.dart';
+import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/functions/calculate_difference_to_birthdate.dart';
 import '../../../../core/functions/date_format.dart';
@@ -111,12 +113,21 @@ class NearestBirthDateStudent extends StatelessWidget {
                       trailing: CircleAvatar(
                         child: IconButton(
                             onPressed: () {
-                              StudentCubit.get(context).callPhone(
-                                StudentCubit.get(context)
-                                        .birthDateStudentModel[index]
-                                        .phone ??
-                                    AppString.not_found.tr(),
-                              );
+                              if(StudentCubit.get(context)
+                                  .birthDateStudentModel[index]
+                                  .phone != null && StudentCubit.get(context)
+                                  .birthDateStudentModel[index]
+                                  .phone != ''){
+                                StudentCubit.get(context).callPhone(
+                                  StudentCubit.get(context)
+                                      .birthDateStudentModel[index]
+                                      .phone ??
+                                      AppString.phone_not_found.tr(),
+                                );
+                              }else{
+                                MyToast(msg: AppString.phone_not_found, state: ToastStates.WARNING);
+                              }
+
                             },
                             icon: const Icon(AppIcons.phone)),
                       ),
@@ -124,69 +135,117 @@ class NearestBirthDateStudent extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          (StudentCubit.get(context)
+                              .birthDateStudentModel[index].phone != null &&
+                              StudentCubit.get(context)
+                                  .birthDateStudentModel[index].phone != '')
+                              ? Text(
                             StudentCubit.get(context)
-                                    .birthDateStudentModel[index]
-                                    .phone ??
-                                AppString.not_found.tr(),
-                          ),
-                          Row(
-                            children: [
-                              Visibility(
-                                visible: difference(StudentCubit.get(context)
-                                            .birthDateStudentModel[index]
-                                            .birthDate) == 0,
-                                child: Expanded(
-                                  child: MyText(
-                                    AppString.today,
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ),
-                              ),
-                              Visibility(
-                                visible: difference(StudentCubit.get(context)
-                                    .birthDateStudentModel[index]
-                                    .birthDate) == 1,
-                                child: Expanded(
-                                  child: MyText(
-                                    AppString.tomorrow,
-                                    style:
-                                    Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ),
-                              ),
-                              Visibility(
-                                visible: difference(StudentCubit.get(context)
-                                    .birthDateStudentModel[index]
-                                    .birthDate) == -1,
-                                child: Expanded(
-                                  child: MyText(
-                                    AppString.yesterday,
-                                    style:
-                                    Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ),
-                              ),
-                              Visibility(
-                                visible: difference(StudentCubit.get(context)
-                                    .birthDateStudentModel[index]
-                                    .birthDate).abs() > 1,
-                                child: Expanded(
-                                  child: MyText(
-                                    '${difference(StudentCubit.get(context).birthDateStudentModel[index].birthDate) > 0 ? tr('left') : tr('ago') } ${difference(StudentCubit.get(context).birthDateStudentModel[index].birthDate).abs()}  ${tr('day')}',
-                                    style:
-                                    Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                StudentCubit.get(context)
-                                    .birthDateStudentModel[index]
-                                    .birthDate,
-                              ),
-                            ],
+                                .birthDateStudentModel[index].phone ?? '',
+                            style:
+                            Theme.of(context).textTheme.labelSmall,
                           )
+                              : MyText(
+                            AppString.phone_not_found,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall!
+                                .copyWith(color: AppColors.red),
+                          ),
+                          StudentCubit.get(context)
+                                      .birthDateStudentModel[index]
+                                      .birthDate ==
+                                  null
+                              ? Text(
+                                  StudentCubit.get(context)
+                                          .birthDateStudentModel[index]
+                                          .birthDate ??
+                                      AppString.birthdate_not_registered,
+                                )
+                              : Row(
+                                  children: [
+                                    Visibility(
+                                      visible: StudentCubit.get(context)
+                                                  .birthDateStudentModel[index]
+                                                  .birthDate !=
+                                              null &&
+                                          difference(StudentCubit.get(context)
+                                                  .birthDateStudentModel[index]
+                                                  .birthDate!) ==
+                                              0,
+                                      child: Expanded(
+                                        child: MyText(
+                                          AppString.today,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
+                                        ),
+                                      ),
+                                    ),
+                                    Visibility(
+                                      visible: StudentCubit.get(context)
+                                                  .birthDateStudentModel[index]
+                                                  .birthDate !=
+                                              null &&
+                                          difference(StudentCubit.get(context)
+                                                  .birthDateStudentModel[index]
+                                                  .birthDate!) ==
+                                              1,
+                                      child: Expanded(
+                                        child: MyText(
+                                          AppString.tomorrow,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
+                                        ),
+                                      ),
+                                    ),
+                                    Visibility(
+                                      visible: StudentCubit.get(context)
+                                                  .birthDateStudentModel[index]
+                                                  .birthDate !=
+                                              null &&
+                                          difference(StudentCubit.get(context)
+                                                  .birthDateStudentModel[index]
+                                                  .birthDate!) ==
+                                              -1,
+                                      child: Expanded(
+                                        child: MyText(
+                                          AppString.yesterday,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
+                                        ),
+                                      ),
+                                    ),
+                                    Visibility(
+                                      visible: StudentCubit.get(context)
+                                                  .birthDateStudentModel[index]
+                                                  .birthDate !=
+                                              null &&
+                                          difference(StudentCubit.get(context)
+                                                      .birthDateStudentModel[
+                                                          index]
+                                                      .birthDate!)
+                                                  .abs() >
+                                              1,
+                                      child: Expanded(
+                                        child: MyText(
+                                          '${difference(StudentCubit.get(context).birthDateStudentModel[index].birthDate!) > 0 ? tr('left') : tr('ago')} ${difference(StudentCubit.get(context).birthDateStudentModel[index].birthDate!).abs()}  ${tr('day')}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      StudentCubit.get(context)
+                                              .birthDateStudentModel[index]
+                                              .birthDate ??
+                                          AppString.birthdate_not_registered,
+                                    ),
+                                  ],
+                                )
                         ],
                       ),
                     ),

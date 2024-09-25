@@ -67,5 +67,7 @@
   "show_birthdate": "Show Birthdate",
   "tomorrow": "Tomorrow",
   "today": "Today",
-  "yesterday": "Yesterday"
+  "yesterday": "Yesterday",
+  "birthdate_not_registered": "Birthdate not registered",
+  "phone_not_found": "Phone not registered yet"
 }

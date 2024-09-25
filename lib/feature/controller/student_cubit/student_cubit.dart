@@ -32,10 +32,9 @@ class StudentCubit extends Cubit<StudentState> {
 
   Future<void> addStudent({
     required String name,
-    required String phone,
-    required String birthDate,
+    String? phone,
+    String? birthDate,
     required int academicYear,
-    String? code,
     bool fromDownload = false,
   }) async {
     emit(AddStudentLoading());
@@ -45,22 +44,23 @@ class StudentCubit extends Cubit<StudentState> {
         batch.insert(
             ApiKey.studentTable,
             StudentModel(
-                    id: 0,
-                    code: code?? DateTime.now()
-                        .millisecondsSinceEpoch
-                        .toString()
-                        .substring(7),
-                    name: name,
-                    points: [],
-                    phone: phone,
-                    activityIDs: [],
-                    attendance: [],
-                    academicYear: academicYear,
-                    birthDate: birthDate)
+                id: 0,
+                code: DateTime
+                    .now()
+                    .millisecondsSinceEpoch
+                    .toString()
+                    .substring(7),
+                name: name,
+                points: [],
+                phone: phone,
+                activityIDs: [],
+                attendance: [],
+                academicYear: academicYear,
+                birthDate: birthDate)
                 .toJson());
         await batch.commit();
         emit(AddStudentSuccess());
-        if(!fromDownload){
+        if (!fromDownload) {
           getStudent();
         }
       } on MyDatabaseException catch (error) {
@@ -82,8 +82,6 @@ class StudentCubit extends Cubit<StudentState> {
             response.map((e) => StudentModel.fromJson(e)));
         searchStudentModel = List<StudentModel>.from(
             response.map((e) => StudentModel.fromJson(e)));
-        // absentStudentModel = List<StudentModel>.from(
-        //     response.map((e) => StudentModel.fromJson(e)));
         emit(GetStudentSuccess());
       } on MyDatabaseException catch (error) {
         GlobalFunction.errorPrint(error, 'get student');
@@ -98,8 +96,8 @@ class StudentCubit extends Cubit<StudentState> {
   Future<void> updateStudent({
     required String code,
     required String name,
-    required String phone,
-    required String birthDate,
+    required String? phone,
+    required String? birthDate,
     required List<Attendance> attendance,
     required List<String> activityId,
     required List<Points> points,
@@ -137,17 +135,17 @@ class StudentCubit extends Cubit<StudentState> {
     }
   }
 
-  Future<void> deleteStudent({required int id}) async {
+  Future<void> deleteStudent({required String code}) async {
     emit(DeleteStudentLoading());
     if (database != null) {
       try {
         await database!.delete(
           ApiKey.studentTable,
-          where: '${ApiKey.id}=?',
-          whereArgs: [id],
+          where: '${ApiKey.code}=?',
+          whereArgs: [code],
         );
-        studentModel.removeWhere((e) => e.id == id);
-        searchStudentModel.removeWhere((e) => e.id == id);
+        studentModel.removeWhere((e) => e.code == code);
+        searchStudentModel.removeWhere((e) => e.code == code);
         emit(DeleteStudentSuccess());
       } on MyDatabaseException catch (error) {
         GlobalFunction.errorPrint(error, 'delete student');
@@ -165,12 +163,6 @@ class StudentCubit extends Cubit<StudentState> {
     searchStudentModel.addAll(studentModel.where((e) {
       return e.name.toLowerCase().contains(searchWord.toLowerCase());
     }));
-// for (int i = 0; i < studentModel.length; i++) {
-//   if (studentModel[i].name.toLowerCase().contains(
-//       searchWord.toLowerCase())) {
-//     searchStudentModel.add(studentModel[i]);
-//   }
-// }
     emit(SearchStudentSuccess());
   }
 
@@ -189,23 +181,26 @@ class StudentCubit extends Cubit<StudentState> {
         date: dateFormat(DateTime.now()),
         attendTime: attendTime,
       ));
-      studentModel.firstWhere((e) => e.code == stCode).attendance.add(Attendance(
+      studentModel
+          .firstWhere((e) => e.code == stCode)
+          .attendance
+          .add(Attendance(
         studentCode: stCode,
         activityCode: actCode,
-            attend: true,
-            date: dateFormat(DateTime.now()),
-            attendTime: attendTime,
-          ));
+        attend: true,
+        date: dateFormat(DateTime.now()),
+        attendTime: attendTime,
+      ));
       searchStudentModel
           .firstWhere((e) => e.code == stCode)
           .attendance
           .add(Attendance(
         studentCode: stCode,
         activityCode: actCode,
-            attend: true,
-            date: dateFormat(DateTime.now()),
-            attendTime: attendTime,
-          ));
+        attend: true,
+        date: dateFormat(DateTime.now()),
+        attendTime: attendTime,
+      ));
       updateStudent(
         code: student.code,
         name: student.name,
@@ -227,11 +222,11 @@ class StudentCubit extends Cubit<StudentState> {
       {required WeekModel week, required ActivityModel activity}) {
     emit(FilterAbsentStudentLoading());
     absentStudentModel = studentModel
-        .where((s) => !week.attendance.contains(week.attendance
-            .firstWhereOrNull(
-                (a) => a.studentCode == s.code && a.activityCode == activity.code)))
+        .where((s) =>
+    !week.attendance.contains(week.attendance
+        .firstWhereOrNull(
+            (a) => a.studentCode == s.code && a.activityCode == activity.code)))
         .toList();
-    GlobalFunction.print(absentStudentModel.toString());
     emit(FilterAbsentStudentSuccess());
   }
 
@@ -239,33 +234,81 @@ class StudentCubit extends Cubit<StudentState> {
       {required DateTime startTime, required DateTime endTime}) async {
     emit(FilterBirthDateStudentLoading());
     birthDateStudentModel = studentModel
-        .where((s) =>
-            (DateTime(DateTime.now().year, DateTime.parse(s.birthDate).month,
-                        DateTime.parse(s.birthDate).day)
-                    .isAfter(startTime) &&
-                DateTime(DateTime.now().year, DateTime.parse(s.birthDate).month,
-                        DateTime.parse(s.birthDate).day)
-                    .isBefore(endTime)) ||
-            DateTime(DateTime.now().year, DateTime.parse(s.birthDate).month,
-                    DateTime.parse(s.birthDate).day)
+        .where((s) {
+      if (s.birthDate != null && s.birthDate != '') {
+        return (DateTime(
+            DateTime
+                .now()
+                .year,
+            DateTime
+                .parse(s.birthDate??  '2000-10-10' + '00:00:00')
+                .month,
+            DateTime
+                .parse(s.birthDate ??  '2000-10-10' + '00:00:00')
+                .day)
+            .isAfter(startTime) &&
+            DateTime(
+                DateTime
+                    .now()
+                    .year,
+                DateTime
+                    .parse(s.birthDate ??  '2000-10-10'+ '00:00:00')
+                    .month,
+                DateTime
+                    .parse(s.birthDate ??  '2000-10-10'+ '00:00:00')
+                    .day)
+                .isBefore(endTime)) ||
+            DateTime(
+                DateTime
+                    .now()
+                    .year,
+                DateTime
+                    .parse(s.birthDate ??  '2000-10-10'+ '00:00:00')
+                    .month,
+                DateTime
+                    .parse(s.birthDate??  '2000-10-10'+ '00:00:00')
+                    .day)
                 .isAtSameMomentAs(startTime) ||
-            DateTime(DateTime.now().year, DateTime.parse(s.birthDate).month,
-                    DateTime.parse(s.birthDate).day)
-                .isAtSameMomentAs(endTime))
+            DateTime(
+                DateTime
+                    .now()
+                    .year,
+                DateTime
+                    .parse(s.birthDate ??  '2000-10-10'+ '00:00:00')
+                    .month,
+                DateTime
+                    .parse(s.birthDate ??  '2000-10-10'+ '00:00:00')
+                    .day)
+                .isAtSameMomentAs(endTime);
+      }else{
+        return false;
+      }
+    })
         .toList();
     birthDateStudentModel.sort((a, b) {
       return difference(DateTime(
-                  DateTime.now().year,
-                  DateTime.parse(b.birthDate).month,
-                  DateTime.parse(b.birthDate).day)
-              .toString())
+          DateTime
+              .now()
+              .year,
+          DateTime
+              .parse(b.birthDate ??  '2000-10-10'+ '00:00:00')
+              .month,
+          DateTime
+              .parse(b.birthDate ??  '2000-10-10'+ '00:00:00')
+              .day)
+          .toString())
           .compareTo(difference(DateTime(
-                  DateTime.now().year,
-                  DateTime.parse(a.birthDate).month,
-                  DateTime.parse(a.birthDate).day)
-              .toString()));
+          DateTime
+              .now()
+              .year,
+          DateTime
+              .parse(a.birthDate ??  '2000-10-10'+ '00:00:00')
+              .month,
+          DateTime
+              .parse(a.birthDate ??  '2000-10-10'+ '00:00:00')
+              .day)
+          .toString()));
     });
-    GlobalFunction.print(birthDateStudentModel.toString());
     emit(FilterBirthDateStudentSuccess());
   }
 
@@ -277,15 +320,18 @@ class StudentCubit extends Cubit<StudentState> {
     try {
       StudentModel student = studentModel.firstWhere((e) => e.code == stCode);
       student.attendance
-          .removeWhere((e) => e.studentCode == stCode && e.activityCode == actCode);
+          .removeWhere((e) =>
+      e.studentCode == stCode && e.activityCode == actCode);
       studentModel
           .firstWhere((e) => e.code == stCode)
           .attendance
-          .removeWhere((e) => e.studentCode == stCode && e.activityCode == actCode);
+          .removeWhere((e) =>
+      e.studentCode == stCode && e.activityCode == actCode);
       searchStudentModel
           .firstWhere((e) => e.code == stCode)
           .attendance
-          .removeWhere((e) => e.studentCode == stCode && e.activityCode == actCode);
+          .removeWhere((e) =>
+      e.studentCode == stCode && e.activityCode == actCode);
       updateStudent(
         code: student.code,
         name: student.name,
@@ -320,7 +366,8 @@ class StudentCubit extends Cubit<StudentState> {
           .toList()[0]
           .map((e) => StudentModel.fromJson(e)));
       for (var e in st) {
-        if(studentModel.firstWhereOrNull((s)=> s.name == e.name && s.code == e.code) == null){
+        if (studentModel.firstWhereOrNull((s) =>
+        s.name == e.name && s.code == e.code) == null) {
           batch.insert(
               ApiKey.studentTable,
               StudentModel(
@@ -333,7 +380,8 @@ class StudentCubit extends Cubit<StudentState> {
                   attendance: e.attendance,
                   academicYear: e.academicYear,
                   birthDate: e.birthDate)
-                  .toJson());        }
+                  .toJson());
+        }
       }
       await batch.commit();
       getStudent();
@@ -380,11 +428,11 @@ class StudentCubit extends Cubit<StudentState> {
       path: '+2$phone',
     ))) {
       await launchUrl(
-              Uri(
-                scheme: 'tel',
-                path: '+2$phone',
-              ),
-              mode: LaunchMode.externalNonBrowserApplication)
+          Uri(
+            scheme: 'tel',
+            path: '+2$phone',
+          ),
+          mode: LaunchMode.externalNonBrowserApplication)
           .catchError((error) {
         GlobalFunction.errorPrint(error, 'call phone');
         MyToast(msg: error.toString(), state: ToastStates.FAILED);

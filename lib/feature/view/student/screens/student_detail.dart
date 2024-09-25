@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:youth_power/core/component/my_toast.dart';
 import 'package:youth_power/core/functions/calculate_difference_to_birthdate.dart';
 import '../../../../core/component/shadow_box.dart';
 import '../../../../core/constants/enums.dart';
@@ -38,14 +39,12 @@ class StudentDetail extends StatelessWidget {
       for (var item in studentModel.activityIDs ?? []) {
         ActivityCubit.get(context).activityModel.firstWhereOrNull((element) {
           if (element.id == item) {
-            GlobalFunction.print(element.name);
             activity.add(element);
           }
           return element.id == item;
         });
       }
       for (var i in studentModel.points ?? []) {
-        GlobalFunction.print(studentModel.points.toString(), name: 'points');
         ActivityCubit.get(context).activityModel.firstWhereOrNull((element) {
           if (element.id == i.activityId) {
             act.add(element);
@@ -94,16 +93,31 @@ class StudentDetail extends StatelessWidget {
                       ),
                       InkWell(
                         onTap: () {
-                          studentCubit.callPhone(studentModel.phone ??'');
+                          if(studentModel.phone !=  null && studentModel.phone != ''){
+                            studentCubit.callPhone(studentModel.phone ?? '');
+                          }else{
+                            MyToast(msg: AppString.phone_not_found, state: ToastStates.WARNING);
+                          }
+
                         },
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              studentModel.phone ?? AppString.not_found,
-                              style: Theme.of(context).textTheme.labelSmall,
-                            ),
+                            (studentModel.phone != null &&
+                                    studentModel.phone != '')
+                                ? Text(
+                                    studentModel.phone ?? '',
+                                    style:
+                                        Theme.of(context).textTheme.labelSmall,
+                                  )
+                                : MyText(
+                                    AppString.phone_not_found,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall!
+                                        .copyWith(color: AppColors.red),
+                                  ),
                             const SizedBox(
                               width: 10,
                             ),
@@ -124,8 +138,8 @@ class StudentDetail extends StatelessWidget {
                             Expanded(
                               child: InkWell(
                                 onTap: () {
-                                  StudentCubit.get(context).deleteStudent(
-                                    id:  studentModel.id);
+                                  StudentCubit.get(context)
+                                      .deleteStudent(code: studentModel.code);
                                   pop(context);
                                 },
                                 child: SmallChip(
@@ -143,13 +157,15 @@ class StudentDetail extends StatelessWidget {
                             ),
                             Expanded(
                               child: InkWell(
-                                onTap: ()  async{
-                                 await  showDialog(
+                                onTap: () async {
+                                  await showDialog(
                                     context: context,
                                     builder: (context) {
                                       return AddStudentDialog(
                                         edit: true,
-                                        student: studentCubit.studentModel.firstWhere((e)=> e.id == studentModel.id),
+                                        student: studentCubit.studentModel
+                                            .firstWhere(
+                                                (e) => e.id == studentModel.id),
                                       );
                                     },
                                   );
@@ -249,7 +265,8 @@ class StudentDetail extends StatelessWidget {
                       // ),
 
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
                         child: Container(
                           decoration: BoxDecoration(
                             boxShadow: boxShadow(),
@@ -257,70 +274,126 @@ class StudentDetail extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 15),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
                             child: ListTile(
                               contentPadding: EdgeInsets.zero,
                               title: Row(
                                 children: [
-                                  const Icon(AppIcons.birth_date,),
-                                  const SizedBox(width: 10,),
-                                  Expanded(child: MyText(AppString.birth_date,style: Theme.of(context).textTheme.titleMedium),),
-                                  Text(studentModel.birthDate),
+                                  const Icon(
+                                    AppIcons.birth_date,
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: MyText(AppString.birth_date,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium),
+                                  ),
+                                  studentModel.birthDate != null &&
+                                          studentModel.birthDate != ''
+                                      ? Text(studentModel.birthDate ??
+                                          AppString.birthdate_not_registered)
+                                      : MyText(
+                                          AppString.birthdate_not_registered,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium!
+                                              .copyWith(color: AppColors.red),
+                                        ),
                                 ],
                               ),
-                              subtitle:  Row(
-                                children: [
-                                  Visibility(
-                                    visible: difference(studentModel
-                                        .birthDate) == 0,
-                                    child: Expanded(
-                                      child: MyText(
-                                        AppString.today,
-                                        style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                      ),
+                              subtitle: studentModel.birthDate != null &&
+                                      studentModel.birthDate != ''
+                                  ? Row(
+                                      children: [
+                                        Visibility(
+                                          visible: studentModel.birthDate !=
+                                                  null &&
+                                              difference(
+                                                      studentModel.birthDate ??
+                                                          '2000-10-10') ==
+                                                  0,
+                                          child: Expanded(
+                                            child: MyText(
+                                              AppString.today,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium,
+                                            ),
+                                          ),
+                                        ),
+                                        Visibility(
+                                          visible: studentModel.birthDate !=
+                                                  null &&
+                                              difference(
+                                                      studentModel.birthDate ??
+                                                          '2000-10-10') ==
+                                                  1,
+                                          child: Expanded(
+                                            child: MyText(
+                                              AppString.tomorrow,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium,
+                                            ),
+                                          ),
+                                        ),
+                                        Visibility(
+                                          visible: studentModel.birthDate !=
+                                                  null &&
+                                              difference(
+                                                      studentModel.birthDate ??
+                                                          '2000-10-10') ==
+                                                  -1,
+                                          child: Expanded(
+                                            child: MyText(
+                                              AppString.yesterday,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium,
+                                            ),
+                                          ),
+                                        ),
+                                        Visibility(
+                                          visible:
+                                              studentModel.birthDate != null &&
+                                                  difference(studentModel
+                                                                  .birthDate ??
+                                                              '2000-10-10')
+                                                          .abs() >
+                                                      1,
+                                          child: Expanded(
+                                            child: MyText(
+                                              '${difference(studentModel.birthDate ?? '2000-10-10') > 0 ? tr('left') : tr('ago')} ${difference(studentModel.birthDate ?? '2000-10-10').abs()}  ${tr('day')}',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : MyText(
+                                      AppString.birthdate_not_registered,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium!
+                                          .copyWith(
+                                            color: AppColors.red,
+                                          ),
                                     ),
-                                  ),
-                                  Visibility(
-                                    visible: difference(studentModel
-                                        .birthDate) == 1,
-                                    child: Expanded(
-                                      child: MyText(
-                                        AppString.tomorrow,
-                                        style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                      ),
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: difference(studentModel
-                                        .birthDate) == -1,
-                                    child: Expanded(
-                                      child: MyText(
-                                        AppString.yesterday,
-                                        style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                      ),
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: difference(studentModel
-                                        .birthDate).abs() > 1,
-                                    child: Expanded(
-                                      child: MyText(
-                                        '${difference(studentModel.birthDate) > 0 ? tr('left') : tr('ago') } ${difference(studentModel.birthDate).abs()}  ${tr('day')}',
-                                        style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                      ),
-                                    ),
-                                  ),                                ],
-                              ),
                             ),
                           ),
                         ),
                       ),
                       AttendCaller(studentModel: studentModel),
-                      QRCode(studentModel: studentModel,device: device,),
+                      QRCode(
+                        studentModel: studentModel,
+                        device: device,
+                      ),
                     ],
                   ),
                 ),
@@ -385,8 +458,7 @@ class StudentDetail extends StatelessWidget {
                                                     edit: true,
                                                     student: studentCubit
                                                             .studentModel[
-                                                        studentModel
-                                                            .id],
+                                                        studentModel.id],
                                                   );
                                                 },
                                               );
@@ -427,20 +499,37 @@ class StudentDetail extends StatelessWidget {
                                           ),
                                           InkWell(
                                             onTap: () {
-                                              studentCubit.callPhone(
-                                                  studentModel.phone ?? '');
+                                              if(studentModel.phone !=  null && studentModel.phone != ''){
+                                                studentCubit.callPhone(studentModel.phone ?? '');
+                                              }else{
+                                                MyToast(msg: AppString.phone_not_found, state: ToastStates.WARNING);
+                                              }
                                             },
                                             child: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Text(
-                                                  studentModel.phone ?? AppString.not_found,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .labelSmall,
-                                                ),
+                                                (studentModel.phone != null &&
+                                                        studentModel.phone !=
+                                                            '')
+                                                    ? Text(
+                                                        studentModel.phone ??
+                                                            '',
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .labelSmall,
+                                                      )
+                                                    : MyText(
+                                                        AppString
+                                                            .phone_not_found,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .labelSmall!
+                                                            .copyWith(
+                                                                color: AppColors
+                                                                    .red),
+                                                      ),
                                                 const SizedBox(
                                                   width: 10,
                                                 ),

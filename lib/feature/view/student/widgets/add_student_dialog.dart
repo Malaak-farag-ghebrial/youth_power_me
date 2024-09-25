@@ -30,7 +30,7 @@ class AddStudentDialog extends StatelessWidget {
             nameController.text = student!.name;
             phoneController.text = student!.phone ?? '';
             academicController.text = student!.academicYear.toString();
-            birthDateController.text = student!.birthDate;
+            birthDateController.text = student!.birthDate ?? '';
           }
           return MyDialog(
             title: AppString.add_student,
@@ -92,7 +92,6 @@ class AddStudentDialog extends StatelessWidget {
             ),
             accept: () {
               if (nameController.text.isNotEmpty &&
-                  phoneController.text.isNotEmpty &&
                   academicController.text.isNotEmpty) {
                 if (int.tryParse(academicController.text) != null) {
                   if (edit && student != null) {

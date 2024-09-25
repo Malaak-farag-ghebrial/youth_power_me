@@ -89,7 +89,7 @@ final searchController = TextEditingController();
                         child: StudentCard(
                           student: studentCubit.searchStudentModel[index],
                           onDeletePressed: (){
-                            studentCubit.deleteStudent(id: studentCubit.searchStudentModel[index].id ?? 0);
+                            studentCubit.deleteStudent(code: studentCubit.searchStudentModel[index].code);
                           },
                           onEditPressed: ()async{
                             await showDialog(context: context,

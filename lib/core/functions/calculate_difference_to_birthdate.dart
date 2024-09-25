@@ -11,10 +11,8 @@ int difference(String birthdate) {
      .difference(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,))
      .inDays;
  if(days.abs() <= daysToNewYear.abs()){
-   GlobalFunction.print(days.toString(),name: birthdate);
    return days;
  }else{
-   GlobalFunction.print(daysToNewYear.toString(),name: birthdate);
    return daysToNewYear;
  }
 

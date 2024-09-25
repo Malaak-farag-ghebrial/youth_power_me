@@ -42,6 +42,7 @@ class AppString {
   static String inBetween = 'inBetween';
   static String exit_app = 'exit_app';
   static String not_found = 'not_found';
+  static String phone_not_found = 'phone_not_found';
   static String sheetName = 'sheet_name';
   static String seriesNumber = 'series_number';
   static String import_excel = 'import_excel';
@@ -57,6 +58,7 @@ class AppString {
   static String tomorrow = 'tomorrow';
   static String yesterday = 'yesterday';
   static String academic_year_is_number = 'academic_year_is_number';
+  static String birthdate_not_registered = 'birthdate_not_registered';
 
   static String empty_address = 'empty_address';
   static String activity = 'activity';

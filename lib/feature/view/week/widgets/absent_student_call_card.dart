@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/component/my_text.dart';
+import '../../../../core/component/my_toast.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/constants/app_strings.dart';
@@ -23,7 +24,12 @@ class AbsentStudentCallCard extends StatelessWidget {
     var weekCubit = WeekCubit.get(context);
     return InkWell(
       onTap: () {
-        StudentCubit.get(context).callPhone(student.phone ?? '');
+        if(student.phone !=  null && student.phone != ''){
+          StudentCubit.get(context).callPhone(student.phone ?? '');
+        }else{
+          MyToast(msg: AppString.phone_not_found, state: ToastStates.WARNING);
+        }
+
       },
       child: Card(
           child: ListTile(
@@ -33,7 +39,12 @@ class AbsentStudentCallCard extends StatelessWidget {
             trailing: CircleAvatar(
               child: IconButton(
                   onPressed: () {
-                    StudentCubit.get(context).callPhone(student.phone ?? '');
+                    if(student.phone !=  null && student.phone != ''){
+                      StudentCubit.get(context).callPhone(student.phone ?? '');
+                    }else{
+                      MyToast(msg: AppString.phone_not_found, state: ToastStates.WARNING);
+                    }
+
                   },
                   icon: const Icon(AppIcons.phone)),
             ),

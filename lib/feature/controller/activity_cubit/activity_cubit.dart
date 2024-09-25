@@ -73,8 +73,6 @@ class ActivityCubit extends Cubit<ActivityState> {
         final response = await database!.query(ApiKey.activityTable);
         activityModel = List<ActivityModel>.from(
             response.map((e) => ActivityModel.fromJson(e)));
-        GlobalFunction.print(activityModel[0].code.toString());
-        GlobalFunction.print(activityModel[1].code.toString());
         emit(GetActivitySuccess());
       } on MyDatabaseException catch (error) {
         GlobalFunction.errorPrint(error, 'get activity');
@@ -113,8 +111,8 @@ class ActivityCubit extends Cubit<ActivityState> {
                   points: points,
                   attendance: attendance)
               .toJson(),
-          where: '${ApiKey.id}=?',
-          whereArgs: [id],
+          where: '${ApiKey.code}=?',
+          whereArgs: [code],
         );
         await batch.commit();
         emit(EditActivitySuccess());
@@ -129,16 +127,16 @@ class ActivityCubit extends Cubit<ActivityState> {
     }
   }
 
-  Future<void> deleteActivity({required int id}) async {
+  Future<void> deleteActivity({required String code}) async {
     emit(DeleteActivityLoading());
     if(database != null){
       try{
         await database!.delete(
           ApiKey.activityTable,
-          where: '${ApiKey.id}=?',
-          whereArgs: [id],
+          where: '${ApiKey.code}=?',
+          whereArgs: [code],
         );
-        activityModel.removeWhere((e)=> e.id == id);
+        activityModel.removeWhere((e)=> e.code == code);
         emit(DeleteActivitySuccess());
       }on MyDatabaseException catch(error){
         GlobalFunction.errorPrint(error, 'delete activity');
@@ -159,7 +157,6 @@ class ActivityCubit extends Cubit<ActivityState> {
           .map((e) => e.data()[ApiKey.activity])
           .toList()[0]
           .map((e) => ActivityModel.fromJson(e)));
-      GlobalFunction.print(act.toString());
       for (var e in act) {
         if(activityModel.firstWhereOrNull((a)=> a.code == e.code) == null){
           batch.insert(
@@ -171,11 +168,10 @@ class ActivityCubit extends Cubit<ActivityState> {
                   times: e.times,
                   available: e.available,
                   repeated: e.repeated,
-                  attendance: e.attendance).toJson());        }
+                  attendance: e.attendance).toJson()); }
       }
       await batch.commit();
       getActivity();
-      GlobalFunction.print(activityModel.toString());
     } catch (error) {
       GlobalFunction.errorPrint(error, 'download activity');
     }

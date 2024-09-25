@@ -67,5 +67,7 @@
   "show_birthdate": "إظهار اعياد الميلاد ",
   "tomorrow": "غدا",
   "today": "اليوم",
-  "yesterday": "أمس"
+  "yesterday": "أمس",
+  "birthdate_not_registered": "تاريخ الميلاد لم يسجل بعد",
+  "phone_not_found": "الهاتف لم يسجل بعد"
 }

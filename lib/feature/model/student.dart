@@ -14,12 +14,8 @@ class StudentModel extends Equatable {
      List<Points>? points;
      List<Attendance> attendance;
      List<String>? activityIDs;
-
-  // final List<ActivityModel> activities;
-  //final String gender;
     final int? academicYear;
-
-  final String birthDate;
+  final String? birthDate;
 
    StudentModel({
     required this.id,
@@ -28,9 +24,7 @@ class StudentModel extends Equatable {
     required this.name,
     this.phone,
      this.points,
-    //required this.gender,
      this.activityIDs  ,
-    // required this.activities,
     this.academicYear,
      required this.attendance,
     required this.birthDate,
