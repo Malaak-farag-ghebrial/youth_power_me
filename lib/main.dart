@@ -3,6 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:youth_power/core/component/my_toast.dart';
 
 import 'core/constants/app_constant.dart';
 import 'core/constants/lists.dart';
@@ -16,10 +19,44 @@ import 'feature/controller/student_cubit/student_cubit.dart';
 import 'feature/controller/week_cubit/week_cubit.dart';
 import 'feature/view/home/screen/home_layout.dart';
 import 'firebase_options.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+@pragma('vm:entry-point')
+void callbackDispatcher() async{
+  Workmanager().executeTask((task, inputData) async {
+    try{
+      WidgetsFlutterBinding.ensureInitialized();
+      await Firebase.initializeApp();
+      MyToast(msg: 'hi there it works $task', state: ToastStates.SUCCESS);
+      GlobalFunction.print('hi there it works');
+      await StudentCubit.scheduleBirthdayNotifications();
 
+
+      return Future.value(true);
+    }catch(e,stack){
+      print("WorkManager task failed: $e");
+      MyToast(msg: 'hi there it $e', state: ToastStates.FAILED);
+
+      print("Stack trace: $stack");
+      return Future.value(false); // Task failed
+    }
+
+
+  });
+}
 void main() async{
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+  AndroidInitializationSettings('@mipmap/ic_launcher'); // Provide your app icon.
+
+  const InitializationSettings initializationSettings =
+  InitializationSettings(android: initializationSettingsAndroid);
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   await Future.wait([
     EasyLocalization.ensureInitialized(),
@@ -30,6 +67,16 @@ void main() async{
 
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  tz.initializeTimeZones();
+  Workmanager().initialize(callbackDispatcher,);
+  Workmanager().registerPeriodicTask(
+      "birthdayCheck",
+      "birthdayNotification",
+      initialDelay: Duration(seconds: 1),
+      frequency: Duration(minutes: 15),
+      inputData: {},
+      constraints: Constraints(networkType: NetworkType.connected,requiresBatteryNotLow: false,requiresCharging: false,requiresDeviceIdle: false,requiresStorageNotLow: false)
+  );
   Bloc.observer = MyBlocObserver();
   runApp(
     EasyLocalization(
@@ -48,6 +95,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context)=> WeekCubit()..createDatabase()),

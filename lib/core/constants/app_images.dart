@@ -1,6 +1,7 @@
 
 class AppImages{
   static const String logo = 'assets/images/logo.png';
+  static const String img = 'assets/images/img.png';
   static const String otp = 'assets/images/otp.png';
   static const String noInternet = 'assets/images/no_internet.png';
   static const String excelInfo = 'assets/images/youth_excel_info.png';

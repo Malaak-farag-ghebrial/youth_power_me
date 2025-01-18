@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youth_power/core/functions/calculate_difference_to_birthdate.dart';
 
 import '../../../core/component/my_toast.dart';
 import '../../../core/constants/api_keyword.dart';
+import '../../../core/constants/app_images.dart';
 import '../../../core/errors/exceptions.dart';
 import '../../../core/functions/date_format.dart';
 import '../../../core/functions/global_variable.dart';
@@ -15,6 +18,7 @@ import '../../model/attendance.dart';
 import '../../model/points.dart';
 import '../../model/student.dart';
 import '../../model/week.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 part 'student_state.dart';
 
@@ -241,10 +245,10 @@ class StudentCubit extends Cubit<StudentState> {
                 .now()
                 .year,
             DateTime
-                .parse(s.birthDate??  '2000-10-10' + '00:00:00')
+                .parse(s.birthDate ?? '2000-10-10' + '00:00:00')
                 .month,
             DateTime
-                .parse(s.birthDate ??  '2000-10-10' + '00:00:00')
+                .parse(s.birthDate ?? '2000-10-10' + '00:00:00')
                 .day)
             .isAfter(startTime) &&
             DateTime(
@@ -252,10 +256,10 @@ class StudentCubit extends Cubit<StudentState> {
                     .now()
                     .year,
                 DateTime
-                    .parse(s.birthDate ??  '2000-10-10'+ '00:00:00')
+                    .parse(s.birthDate ?? '2000-10-10' + '00:00:00')
                     .month,
                 DateTime
-                    .parse(s.birthDate ??  '2000-10-10'+ '00:00:00')
+                    .parse(s.birthDate ?? '2000-10-10' + '00:00:00')
                     .day)
                 .isBefore(endTime)) ||
             DateTime(
@@ -263,10 +267,10 @@ class StudentCubit extends Cubit<StudentState> {
                     .now()
                     .year,
                 DateTime
-                    .parse(s.birthDate ??  '2000-10-10'+ '00:00:00')
+                    .parse(s.birthDate ?? '2000-10-10' + '00:00:00')
                     .month,
                 DateTime
-                    .parse(s.birthDate??  '2000-10-10'+ '00:00:00')
+                    .parse(s.birthDate ?? '2000-10-10' + '00:00:00')
                     .day)
                 .isAtSameMomentAs(startTime) ||
             DateTime(
@@ -274,13 +278,13 @@ class StudentCubit extends Cubit<StudentState> {
                     .now()
                     .year,
                 DateTime
-                    .parse(s.birthDate ??  '2000-10-10'+ '00:00:00')
+                    .parse(s.birthDate ?? '2000-10-10' + '00:00:00')
                     .month,
                 DateTime
-                    .parse(s.birthDate ??  '2000-10-10'+ '00:00:00')
+                    .parse(s.birthDate ?? '2000-10-10' + '00:00:00')
                     .day)
                 .isAtSameMomentAs(endTime);
-      }else{
+      } else {
         return false;
       }
     })
@@ -291,10 +295,10 @@ class StudentCubit extends Cubit<StudentState> {
               .now()
               .year,
           DateTime
-              .parse(b.birthDate ??  '2000-10-10'+ '00:00:00')
+              .parse(b.birthDate ?? '2000-10-10' + '00:00:00')
               .month,
           DateTime
-              .parse(b.birthDate ??  '2000-10-10'+ '00:00:00')
+              .parse(b.birthDate ?? '2000-10-10' + '00:00:00')
               .day)
           .toString())
           .compareTo(difference(DateTime(
@@ -302,10 +306,10 @@ class StudentCubit extends Cubit<StudentState> {
               .now()
               .year,
           DateTime
-              .parse(a.birthDate ??  '2000-10-10'+ '00:00:00')
+              .parse(a.birthDate ?? '2000-10-10' + '00:00:00')
               .month,
           DateTime
-              .parse(a.birthDate ??  '2000-10-10'+ '00:00:00')
+              .parse(a.birthDate ?? '2000-10-10' + '00:00:00')
               .day)
           .toString()));
     });
@@ -389,6 +393,147 @@ class StudentCubit extends Cubit<StudentState> {
       GlobalFunction.errorPrint(error, 'download student');
     }
   }
+
+  static Future<void> scheduleBirthdayNotifications() async {
+   // await Firebase.initializeApp(name: 'secondary for background');
+
+
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+    // flutterLocalNotificationsPlugin.show(
+    //     1, 'hi there from inside', 'look what i did', NotificationDetails(
+    //     android: AndroidNotificationDetails('channelId', 'channelName',)));
+    final DateTime now = DateTime.now();
+    DateTime tomorrow = now.add(Duration(days: 1));
+    final String formattedDate = '${tomorrow.year}-${tomorrow.month.toString()
+        .padLeft(2, '0')}-${tomorrow.day}';
+    tomorrow = DateTime.parse(formattedDate);
+    GlobalFunction.print(tomorrow.toString(), name: 'schedular notify');
+
+    try{
+      final response = await FirebaseFirestore.instance.collection('student_table').doc('student_id').get();
+      final student  = response.data()?['student'].where((e)=> e['birth_date'] == formattedDate);
+
+      for (final doc in student) {
+        final String name = doc['name'];
+
+        // Schedule the notification
+
+        await flutterLocalNotificationsPlugin.show(
+          doc['id'].hashCode,
+          'عيد ميلاد 🎉',
+          'غدا عيد ميلاد $name',
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'birthday_channel',
+              'Birthday Notifications',
+              importance: Importance.high,
+              priority: Priority.high,
+            ),
+          ),);
+        // await flutterLocalNotificationsPlugin.zonedSchedule(
+        //   doc.id.hashCode,
+        //   'Birthday Reminder 🎉',
+        //   'Tomorrow is $name\'s birthday!',
+        //
+        //   tz.TZDateTime.now(tz.local).add(Duration(seconds: 5)),
+        //   // Adjust timing here.
+        //   const NotificationDetails(
+        //     android: AndroidNotificationDetails(
+        //       'birthday_channel',
+        //       'Birthday Notifications',
+        //       importance: Importance.high,
+        //       priority: Priority.high,
+        //     ),
+        //   ),
+        //   androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        //   uiLocalNotificationDateInterpretation:
+        //   UILocalNotificationDateInterpretation.absoluteTime,
+        // );
+      }
+    }catch(e){
+      GlobalFunction.errorPrint(e,'erroorooooooo');
+      MyToast(msg: '$e this an error background', state: ToastStates.SUCCESS);
+    }
+
+    //
+    // final response = await database!.query(ApiKey.studentTable);
+    // List<StudentModel> studentModel = List<StudentModel>.from(
+    //     response.map((e) => StudentModel.fromJson(e)));
+    // GlobalFunction.print(
+    //     tomorrow.toString(), name: 'nnnnnnnnnnnnnnnnnnnnnnnnn');
+    // GlobalFunction.print('${DateTime(
+    //     DateTime
+    //         .now()
+    //         .year,
+    //     DateTime
+    //         .parse('${studentModel.last.birthDate ??
+    //         '2000-10-10 00:00:00'} 00:00:00')
+    //         .month,
+    //     DateTime
+    //         .parse('${studentModel.last.birthDate ??
+    //         '2000-10-10 00:00:00'} 00:00:00')
+    //         .day)}', name: 'BBBBBBBBBBBBBBBBBBBBBBBBBBB');
+    // final List<StudentModel> student = studentModel.where((e) {
+    //   if (e.birthDate != null && e.birthDate != '') {
+    //     return DateTime(
+    //         DateTime
+    //             .now()
+    //             .year,
+    //         DateTime
+    //             .parse(e.birthDate ?? '2000-10-10' + ' 00:00:00')
+    //             .month,
+    //         DateTime
+    //             .parse(e.birthDate ?? '2000-10-10' + ' 00:00:00')
+    //             .day)
+    //         .isAtSameMomentAs(tomorrow);
+    //   } else {
+    //     return false;
+    //   }
+    // }).toList();
+    //
+    // GlobalFunction.print(student.toString(), name: 'SSSSSSSSSSSSSSSSSSSSS');
+    //
+    // for (final doc in student) {
+    //   final String name = doc.name;
+    //
+    //   // Schedule the notification
+    //
+    //   await flutterLocalNotificationsPlugin.show(
+    //       doc.id.hashCode,
+    //     'Birthday Reminder 🎉',
+    //     'Tomorrow is $name\'s birthday!',
+    //     const NotificationDetails(
+    //       android: AndroidNotificationDetails(
+    //         'birthday_channel',
+    //         'Birthday Notifications',
+    //         importance: Importance.high,
+    //         priority: Priority.high,
+    //       ),
+    //     ),);
+    //   // await flutterLocalNotificationsPlugin.zonedSchedule(
+    //   //   doc.id.hashCode,
+    //   //   'Birthday Reminder 🎉',
+    //   //   'Tomorrow is $name\'s birthday!',
+    //   //
+    //   //   tz.TZDateTime.now(tz.local).add(Duration(seconds: 5)),
+    //   //   // Adjust timing here.
+    //   //   const NotificationDetails(
+    //   //     android: AndroidNotificationDetails(
+    //   //       'birthday_channel',
+    //   //       'Birthday Notifications',
+    //   //       importance: Importance.high,
+    //   //       priority: Priority.high,
+    //   //     ),
+    //   //   ),
+    //   //   androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    //   //   uiLocalNotificationDateInterpretation:
+    //   //   UILocalNotificationDateInterpretation.absoluteTime,
+    //   // );
+    // }
+  }
+
 
 // todo excel export
 //   Future<void> getStudentFromExcel({

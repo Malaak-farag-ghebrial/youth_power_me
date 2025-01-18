@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../../../core/component/my_indicator.dart';
 import '../../../../core/component/my_navigator.dart';
@@ -17,6 +18,8 @@ class SettingScreen extends StatelessWidget {
   SettingScreen({super.key});
 
   final keyController = TextEditingController();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +65,13 @@ class SettingScreen extends StatelessWidget {
               cardName: AppString.import_excel,
               onTap: () async {
               navigateTo(context, const BulkUpload());
+              },
+            ),
+            MenuCard(
+              icon: AppIcons.work,
+              cardName: AppString.under_development,
+              onTap: () async {
+                StudentCubit.scheduleBirthdayNotifications();
               },
             ),
           ],

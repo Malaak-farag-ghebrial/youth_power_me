@@ -52,26 +52,28 @@ class MainScreen extends StatelessWidget {
               : Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ListView.builder(
-                      itemCount: weekCubit.weekModel.length,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: () {
-                            navigateTo(
-                                context,
-                                WeekActivity(
-                                    weekModel: weekCubit.weekModel[index]));
-                          },
-                          child: WeekCard(
-                            week: weekCubit.weekModel[index],
-                            onDeletePressed: () {
-                              weekCubit.deleteWeek(
-                                  id: weekCubit.weekModel[index].id ?? 0);
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: weekCubit.weekModel.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () {
+                              navigateTo(
+                                  context,
+                                  WeekActivity(
+                                      weekModel: weekCubit.weekModel[index]));
                             },
-                          ),
-                        );
-                      },
+                            child: WeekCard(
+                              week: weekCubit.weekModel[index],
+                              onDeletePressed: () {
+                                weekCubit.deleteWeek(
+                                    id: weekCubit.weekModel[index].id ?? 0);
+                              },
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
